@@ -43,7 +43,16 @@ class ParameterPage(ft.View):
             ],
             width=300
         )
-
+        self.your_goal = ft.Dropdown(
+            label="Your Goal:",
+            options=[
+                ft.dropdown.Option("Cut"),
+                ft.dropdown.Option("Bulk"),
+                ft.dropdown.Option("Stay the same weight"),
+                ft.dropdown.Option("No goals yet"),
+            ],
+            width=300
+        )
         self.training_times_value = ft.Text("1")
         self.training_times = ft.Row([
             ft.IconButton(ft.icons.REMOVE, on_click=lambda _: self.decrement(self.training_times_value),
@@ -83,6 +92,8 @@ class ParameterPage(ft.View):
                     ft.Container(height=20),  # Spacer
                     self.main_sport,
                     ft.Container(height=20),  # Spacer
+                    self.your_goal,
+                    ft.Container(height=20),
                     ft.Text("Times a week of training:", size=16, color=ft.colors.BLACK87),
                     self.training_times,
                     ft.Container(height=20),  # Spacer
