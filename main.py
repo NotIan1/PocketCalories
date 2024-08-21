@@ -13,15 +13,8 @@ def main(page: ft.Page):
 
     def route_change(route):
         page.views.clear()
-        page.views.append(
-            ft.View(
-                "/",
-                [
-                    ft.AppBar(title=ft.Text("Main Window"), bgcolor=ft.colors.SURFACE_VARIANT),
-                    navigation_bar
-                ],
-            )
-        )
+        page.views.append(MainWindowPage(page, navigation_bar))
+
         if page.route == "/schedule":
             page.views.append(
                 ft.View(
@@ -34,15 +27,7 @@ def main(page: ft.Page):
             )
 
         elif page.route == "/profile":
-            page.views.append(
-                ft.View(
-                    "/profile",
-                    [
-                        ft.AppBar(title=ft.Text("Profile"), bgcolor=ft.colors.SURFACE_VARIANT),
-                        navigation_bar
-                    ],
-                )
-            )
+            page.views.append(ProfilePage(page, navigation_bar))
         elif page.route == "/parameters":
             page.views.append(ParameterPage(page))
 
