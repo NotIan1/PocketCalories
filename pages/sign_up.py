@@ -88,6 +88,8 @@ class SignupPage(ft.View):
         self.page.update()
 
     def submit(self, e: ControlEvent) -> None:
+        self.page.client_storage.set("username", self.text_username.value)  # save username to local storage
+        self.page.client_storage.set("password",self.text_password.value)
         print("Username:", self.text_username.value)
         print("Password:", self.text_password.value)
 

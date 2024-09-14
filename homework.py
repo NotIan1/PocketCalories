@@ -37,14 +37,14 @@ class Link(ft.TextField):
         self.page.update()
 
 
+# Define a profile page...
 class ProfilePage(ft.View):
-    def __init__(self, page, navbar):
-        super().__init__(route='/profile', padding=20)
-        self.page = page  # сохранить переменную в классе
-        self.navbar = navbar
+    def __init__(self, page: ft.Page):
+        super().__init__(route="/profile", padding=20),
+
+        self.page = page
 
         self.controls = [
-            ft.AppBar(title=ft.Text("Profile"), bgcolor=ft.colors.SURFACE_VARIANT),
             ft.SafeArea(
                 expand=True,
                 content=ft.Column(
@@ -66,7 +66,7 @@ class ProfilePage(ft.View):
                             ),
                         ),
                         ft.Divider(height=10, color="transparent"),
-                        ft.Text(self.page.client_storage.get("name"), size=32),
+                        ft.Text("Line Indent", size=32),
                         ft.Text(
                             "Python Programming | UI/UX Design | GUI & Web Apps",
                             weight="w400",
@@ -84,6 +84,78 @@ class ProfilePage(ft.View):
                         ),
                     ],
                 ),
-            ),
-            self.navbar
+            )
         ]
+
+
+# Define a landing page...
+class LandingPage(ft.View):
+    def __init__(self, page: ft.Page):
+        super().__init__(route="/landing", padding=60)
+
+        self.page = page
+
+        # Define a var for lock icon
+        self.lock = ft.Icon(name="lock", scale=ft.Scale(4))
+
+        # Define a button to route to profile
+        self.button = ft.Container(
+            border_radius=5,
+            expand=True,
+            bgcolor="#F4CE14",
+            content=ft.Text("Check Linkage", color="black", size=18),
+            padding=ft.padding.only(left=25, right=25, top=10, bottom=10),
+            alignment=ft.alignment.center,
+            on_click=None,
+        )
+
+        # Define the list of controls for this view
+        self.controls = [
+            ft.SafeArea(
+                expand=True,
+                content=ft.Column(
+                    alignment="spaceBetween",
+                    controls=[
+                        ft.Column(
+                            controls=[
+                                ft.Divider(height=120, color="transparent"),
+                                self.lock,
+                                ft.Divider(height=70, color="transparent"),
+                                ft.Text(
+                                    "Link management involves organizing, tracking, and optimizing URLs for effective online presence.",
+                                    size=18,
+                                    text_align="center",
+                                ),
+                            ],
+                            horizontal_alignment="center",
+                        ),
+                        ft.Row(controls=[self.button], alignment="center"),
+                    ],
+                ),
+            )
+        ]
+
+
+def main(page: ft.Page):
+    # Define page related settings
+    page.theme_mode = ft.ThemeMode.DARK
+
+    # Define a method to handle page routing
+    def router(route):
+        page.views.clear()
+
+        if page.route == "/landing":
+            landing = LandingPage(page)
+            page.views.append(landing)
+
+        if page.route == "/profile":
+            profile = ProfilePage(page)
+            page.views.append(profile)
+
+        page.update()
+
+    page.on_route_change = router
+    page.go("/profile")
+
+
+ft.app(target=main, assets_dir="assets")
