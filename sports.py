@@ -23,5 +23,6 @@ SPORTS = [
     "Hiking",
     "Dance",
     "Gymnastics",
+    "Squash",
     "Other"
 ]

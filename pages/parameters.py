@@ -110,10 +110,10 @@ class ParameterPage(ft.View):
                 ft.Text("Age:", size=16, color=ft.colors.BLACK87),
                 self.age,
                 ft.Container(height=20),  # Spacer
-                ft.Text("Weight:", size=16, color=ft.colors.BLACK87),
+                ft.Text("Weight,kg:", size=16, color=ft.colors.BLACK87),
                 self.weight,
                 ft.Container(height=20),  # Spacer
-                ft.Text("Height:", size=16, color=ft.colors.BLACK87),
+                ft.Text("Height,cm:", size=16, color=ft.colors.BLACK87),
                 self.height,
                 ft.Container(height=20),  # Spacer
                 ft.Text("Main sport:", size=16, color=ft.colors.BLACK87),
