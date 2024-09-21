@@ -1,71 +1,73 @@
 import flet as ft
 
+from sports import SPORTS
+
+
 class ParameterPage(ft.View):
     def __init__(self, page):
         """Initializes the ParameterPage."""
         super().__init__(route='/parameters', padding=20)
         self.page = page
 
-        # Define input fields
-        self.name = ft.TextField(label="What's your name:", width=300, on_change=self.validate_form)
+        self.main_sport_value = None
+
+        # Define input fields (keeping the existing fields, just adjusted for compactness)
+        self.name = ft.TextField(label="Name:", width=300, on_change=self.validate_form)
 
         self.age_value = ft.TextField(value="0", width=60, on_change=self.validate_form, text_align=ft.TextAlign.CENTER)
         self.age = ft.Row(
             [
-                ft.IconButton(ft.icons.REMOVE, on_click=lambda _: self.decrement(self.age_value), icon_color=ft.colors.RED),
+                ft.IconButton(ft.icons.REMOVE, on_click=lambda _: self.decrement(self.age_value),
+                              icon_color=ft.colors.RED),
                 self.age_value,
-                ft.IconButton(ft.icons.ADD, on_click=lambda _: self.increment(self.age_value), icon_color=ft.colors.GREEN),
+                ft.IconButton(ft.icons.ADD, on_click=lambda _: self.increment(self.age_value),
+                              icon_color=ft.colors.GREEN),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        self.weight_value = ft.TextField(value="0", width=60, on_change=self.validate_form, text_align=ft.TextAlign.CENTER)
+        self.weight_value = ft.TextField(value="0", width=60, on_change=self.validate_form,
+                                         text_align=ft.TextAlign.CENTER)
         self.weight = ft.Row(
             [
-                ft.IconButton(ft.icons.REMOVE, on_click=lambda _: self.decrement(self.weight_value), icon_color=ft.colors.RED),
+                ft.IconButton(ft.icons.REMOVE, on_click=lambda _: self.decrement(self.weight_value),
+                              icon_color=ft.colors.RED),
                 self.weight_value,
-                ft.IconButton(ft.icons.ADD, on_click=lambda _: self.increment(self.weight_value), icon_color=ft.colors.GREEN),
+                ft.IconButton(ft.icons.ADD, on_click=lambda _: self.increment(self.weight_value),
+                              icon_color=ft.colors.GREEN),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        self.height_value = ft.TextField(value="0", width=60, on_change=self.validate_form, text_align=ft.TextAlign.CENTER)
+        self.height_value = ft.TextField(value="0", width=60, on_change=self.validate_form,
+                                         text_align=ft.TextAlign.CENTER)
         self.height = ft.Row(
             [
-                ft.IconButton(ft.icons.REMOVE, on_click=lambda _: self.decrement(self.height_value), icon_color=ft.colors.RED),
+                ft.IconButton(ft.icons.REMOVE, on_click=lambda _: self.decrement(self.height_value),
+                              icon_color=ft.colors.RED),
                 self.height_value,
-                ft.IconButton(ft.icons.ADD, on_click=lambda _: self.increment(self.height_value), icon_color=ft.colors.GREEN),
+                ft.IconButton(ft.icons.ADD, on_click=lambda _: self.increment(self.height_value),
+                              icon_color=ft.colors.GREEN),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        self.training_times_value = ft.TextField(value="0", width=60, on_change=self.validate_form, text_align=ft.TextAlign.CENTER)
+        self.training_times_value = ft.TextField(value="0", width=60, on_change=self.validate_form,
+                                                 text_align=ft.TextAlign.CENTER)
         self.training_times = ft.Row(
             [
-                ft.IconButton(ft.icons.REMOVE, on_click=lambda _: self.decrement(self.training_times_value), icon_color=ft.colors.RED),
+                ft.IconButton(ft.icons.REMOVE, on_click=lambda _: self.decrement(self.training_times_value),
+                              icon_color=ft.colors.RED),
                 self.training_times_value,
-                ft.IconButton(ft.icons.ADD, on_click=lambda _: self.increment(self.training_times_value), icon_color=ft.colors.GREEN),
+                ft.IconButton(ft.icons.ADD, on_click=lambda _: self.increment(self.training_times_value),
+                              icon_color=ft.colors.GREEN),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        self.main_sport = ft.Dropdown(
-            label="Main sport:",
-            options=[
-                ft.dropdown.Option("Swimming"),
-                ft.dropdown.Option("Running"),
-                ft.dropdown.Option("Boxing"),
-                ft.dropdown.Option("Hockey"),
-                ft.dropdown.Option("Ice Hockey"),
-                ft.dropdown.Option("Squash"),
-                ft.dropdown.Option("Cycling"),
-                ft.dropdown.Option("Tennis"),
-                ft.dropdown.Option("Netball"),
-                ft.dropdown.Option("Basketball"),
-                ft.dropdown.Option("Other"),
-            ],
-            width=300,
-            on_change=self.validate_form
+        self.main_sport = ft.AutoComplete(
+            suggestions=[ft.AutoCompleteSuggestion(key=f"{sport.lower()} {sport}", value=sport) for sport in SPORTS],
+            on_select=self.set_main_sport_value
         )
 
         self.your_goal = ft.Dropdown(
@@ -85,50 +87,53 @@ class ParameterPage(ft.View):
         self.save_button = ft.ElevatedButton(
             "Save",
             width=300,
-            disabled=True,  # Initially disabled
+            disabled=True,
             on_click=self.submit,
             style=ft.ButtonStyle(
                 color=ft.colors.WHITE,
-                bgcolor=ft.colors.RED,  # Teal color for the button
-
+                bgcolor=ft.colors.RED,
                 shape=ft.RoundedRectangleBorder(radius=10),
-                padding={"top": 10, "bottom": 10, "left": 10, "right": 10},
+                padding=10,
             ),
         )
 
+        self.scroll=ft.ScrollMode.ALWAYS
+
         # Assemble the page layout
-        self.controls = [ft.Row(
-            controls=[ft.Column(
-                [
-                    ft.Text("Your Parameters:", size=24, weight=ft.FontWeight.BOLD, color="#00796B"),  # Teal color for the title
-                    ft.Container(height=20),  # Spacer
-                    self.name,
-                    ft.Container(height=20),  # Spacer
-                    ft.Text("Age:", size=16, color=ft.colors.BLACK87),
-                    self.age,
-                    ft.Container(height=20),  # Spacer
-                    ft.Text("Weight:", size=16, color=ft.colors.BLACK87),
-                    self.weight,
-                    ft.Container(height=20),  # Spacer
-                    ft.Text("Height:", size=16, color=ft.colors.BLACK87),
-                    self.height,
-                    ft.Container(height=20),  # Spacer
-                    self.main_sport,
-                    ft.Container(height=20),  # Spacer
-                    self.your_goal,
-                    ft.Container(height=20),
-                    ft.Text("Times a week of training:", size=16, color=ft.colors.BLACK87),
-                    self.training_times,
-                    ft.Container(height=20),  # Spacer
-                    self.allergies,
-                    ft.Container(height=30),  # Spacer
-                    self.save_button,
-                ],
-                alignment=ft.MainAxisAlignment.CENTER,  # Center content vertically
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,  # Center content horizontally
-            )],
-            alignment=ft.MainAxisAlignment.CENTER,
+        self.controls = [ft.Column(
+            [
+                ft.Text("Your Parameters:", size=24, weight=ft.FontWeight.BOLD, color="#00796B"),
+                # Teal color for the title
+                ft.Container(height=20),  # Spacer
+                self.name,
+                ft.Container(height=20),  # Spacer
+                ft.Text("Age:", size=16, color=ft.colors.BLACK87),
+                self.age,
+                ft.Container(height=20),  # Spacer
+                ft.Text("Weight:", size=16, color=ft.colors.BLACK87),
+                self.weight,
+                ft.Container(height=20),  # Spacer
+                ft.Text("Height:", size=16, color=ft.colors.BLACK87),
+                self.height,
+                ft.Container(height=20),  # Spacer
+                ft.Text("Main sport:", size=16, color=ft.colors.BLACK87),
+                self.main_sport,
+                ft.Container(height=20),  # Spacer
+                self.your_goal,
+                ft.Container(height=20),
+                ft.Text("Times a week of training:", size=16, color=ft.colors.BLACK87),
+                self.training_times,
+                ft.Container(height=20),  # Spacer
+                self.allergies,
+                ft.Container(height=30),  # Spacer
+                self.save_button,
+            ],
+            alignment=ft.MainAxisAlignment.CENTER,  # Center content vertically
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,  # Center content horizontally
         )]
+
+    def set_main_sport_value(self, e):
+        self.main_sport_value = e.selection
 
     def increment(self, text_ref):
         try:
@@ -158,7 +163,7 @@ class ParameterPage(ft.View):
                 int(self.age_value.value) > 0,
                 int(self.weight_value.value) > 0,
                 int(self.height_value.value) > 0,
-                self.main_sport.value,
+                self.main_sport_value,
                 self.your_goal.value,
                 int(self.training_times_value.value) > 0,
                 # self.allergies.value.strip()  # Included in validation
@@ -177,7 +182,7 @@ class ParameterPage(ft.View):
         self.page.client_storage.set("age", int(self.age_value.value))
         self.page.client_storage.set("weight", int(self.weight_value.value))
         self.page.client_storage.set("height", int(self.height_value.value))
-        self.page.client_storage.set("mainsport", self.main_sport.value)
+        self.page.client_storage.set("mainsport", self.main_sport_value)
         self.page.client_storage.set("goal", self.your_goal.value)
         self.page.client_storage.set("training times", int(self.training_times_value.value))
         self.page.client_storage.set("allergies", self.allergies.value)
@@ -197,6 +202,7 @@ def main(page: ft.Page):
     page.views.append(parameters)
 
     page.update()
+
 
 if __name__ == "__main__":
     ft.app(target=main)

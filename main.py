@@ -2,10 +2,10 @@
 import flet as ft
 
 from navbar import navbar
-from pages.Parameters import ParameterPage
-from pages.Profile import ProfilePage
-from pages.Schedule import SchedulePage
-from pages.mainwindow import MainWindowPage
+from pages.parameters import ParameterPage
+from pages.profile import ProfilePage
+from pages.schedule import SchedulePage
+from pages.main_window import MainWindowPage
 from pages.sign_up import SignupPage
 
 
