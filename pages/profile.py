@@ -1,40 +1,6 @@
 import flet as ft
 
-# Define a link style dict.
-link_style = {
-    "height": 50,
-    "focused_border_color": "#F4CE14",
-    "border_radius": 5,
-    "cursor_height": 16,
-    "cursor_color": "white",
-    "content_padding": 10,
-    "border_width": 1.5,
-    "text_size": 14,
-    "label_style": ft.TextStyle(color="#F4CE14"),
-}
-
-
-# Define a link class...
-class Link(ft.TextField):
-    def __init__(self, label: str, value: str, page: ft.Page):
-        super().__init__(
-            value=value,
-            read_only=True,
-            label=label,
-            on_focus=self.selected,
-            **link_style,
-        )
-
-        self.page = page
-
-    # Define a method to show snackbar for copied event
-    def selected(self, event: ft.TapEvent = None):
-        self.page.snack_bar = ft.SnackBar(
-            ft.Text(f"Copied {self.label}!"), show_close_icon=True, duration=2000
-        )
-
-        self.page.snack_bar.open = True
-        self.page.update()
+from sports import SPORTS
 
 
 class ProfilePage(ft.View):
@@ -43,47 +9,87 @@ class ProfilePage(ft.View):
         self.page = page  # сохранить переменную в классе
         self.navbar = navbar
 
+        # Profile picture
+        self.profile_picture = ft.Container(
+            content=ft.Icon(ft.icons.ACCOUNT_CIRCLE, size=100, color=ft.colors.WHITE),
+            width=120,
+            height=120,
+            border_radius=60,
+            bgcolor="#16E3AF",
+            alignment=ft.alignment.center,
+        )
+
+        # Information display
+        self.name_display = ft.Text("Name: ", size=18, weight=ft.FontWeight.BOLD)
+        self.info_items = [
+            ("Age", "age", "years"),
+            ("Weight", "weight", "kg"),
+            ("Height", "height", "cm"),
+            ("Main sport", "mainsport", ""),
+            ("Training frequency", "training_times", "times/week"),
+            ("Goal", "goal", ""),
+            ("Allergies", "allergies", ""),
+        ]
+        self.info_displays = {key: ft.Text(f"{label}: ", size=16) for label, key, _ in self.info_items}
+
+        # Load data from client_storage
+        self.load_data_from_storage()
+
+        # Layout
         self.controls = [
-            ft.AppBar(title=ft.Text("Profile"), bgcolor=ft.colors.SURFACE_VARIANT),
-            ft.SafeArea(
-                expand=True,
-                content=ft.Column(
-                    horizontal_alignment="center",
-                    controls=[
-                        ft.Divider(height=20, color="transparent"),
-                        ft.Container(
-                            bgcolor="white10",
-                            width=128,
-                            height=128,
-                            shape=ft.BoxShape("circle"),
-                            # Define image for profile picture
-                            image_src="/profile.jpg",
-                            image_fit="cover",
-                            shadow=ft.BoxShadow(
-                                spread_radius=6,
-                                blur_radius=20,
-                                color=ft.colors.with_opacity(0.71, "black"),
-                            ),
-                        ),
-                        ft.Divider(height=10, color="transparent"),
-                        ft.Text(self.page.client_storage.get("name"), size=32),
-                        ft.Text(
-                            "Python Programming | UI/UX Design | GUI & Web Apps",
-                            weight="w400",
-                            text_align="center",
-                        ),
-                        ft.Divider(height=50, color="transparent"),
-                        ft.Column(
-                            spacing=20,
-                            controls=[
-                                # Inerst link items here...
-                                Link("Name", "Line Indent", self.page),
-                                Link("Youtube", "@lineindent", self.page),
-                                Link("Email", "example@gmail.com", self.page),
-                            ],
-                        ),
-                    ],
-                ),
+            ft.AppBar(title=ft.Text("My Profile"), bgcolor="#16E3AF", color=ft.colors.WHITE,                 actions=[
+                    ft.IconButton(
+                        icon=ft.icons.EDIT,
+                        icon_color=ft.colors.WHITE,
+                        tooltip="Edit Profile",
+                        on_click=self.go_to_parameters
+                    )
+                ]),
+            ft.Container(
+                content=ft.Column([
+                    ft.Container(content=self.profile_picture, alignment=ft.alignment.center),
+                    ft.Container(content=self.name_display, alignment=ft.alignment.center),
+                    ft.Divider(height=2, color="#16E3AF"),
+                    ft.Container(height=20),  # Spacer
+                    ft.Column([
+                        self.create_info_row(label, key, unit)
+                        for label, key, unit in self.info_items
+                    ]),
+                ],
+                    alignment=ft.MainAxisAlignment.START,
+                    horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
+                    spacing=10),
+                padding=20,
+                bgcolor=ft.colors.WHITE,
+                border_radius=10,
+                shadow=ft.BoxShadow(
+                    spread_radius=1,
+                    blur_radius=10,
+                    color=ft.colors.BLACK26,
+                    offset=ft.Offset(0, 0),
+                )
             ),
             self.navbar
         ]
+
+    def create_info_row(self, label, key, unit):
+        return ft.Row([
+            ft.Text(f"{label}:", style=ft.TextStyle(weight=ft.FontWeight.BOLD), width=150),
+            ft.Container(
+                content=self.info_displays[key],
+                alignment=ft.alignment.center,
+                expand=True
+            ),
+            ft.Text(unit, width=50) if unit else ft.Container(width=50),
+        ], alignment=ft.MainAxisAlignment.CENTER)
+
+    def load_data_from_storage(self):
+        self.name_display.value = self.page.client_storage.get('name')
+        for label, key, unit in self.info_items:
+            value = self.page.client_storage.get(key)
+            self.info_displays[key].value = f"{value}"
+
+    def go_to_parameters(self, e):
+        self.page.go('/parameters')
+
+        # Profile picture

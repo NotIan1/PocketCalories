@@ -65,10 +65,11 @@ class ParameterPage(ft.View):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        self.main_sport = ft.AutoComplete(
+        self.main_sport = ft.Container(content=ft.AutoComplete(
             suggestions=[ft.AutoCompleteSuggestion(key=f"{sport.lower()} {sport}", value=sport) for sport in SPORTS],
             on_select=self.set_main_sport_value
-        )
+        ),
+            width=300)
 
         self.your_goal = ft.Dropdown(
             label="Your Goal:",
@@ -97,40 +98,41 @@ class ParameterPage(ft.View):
             ),
         )
 
-        self.scroll=ft.ScrollMode.ALWAYS
+        self.scroll = ft.ScrollMode.ALWAYS
 
         # Assemble the page layout
-        self.controls = [ft.Column(
-            [
-                ft.Text("Your Parameters:", size=24, weight=ft.FontWeight.BOLD, color="#00796B"),
-                # Teal color for the title
-                ft.Container(height=20),  # Spacer
-                self.name,
-                ft.Container(height=20),  # Spacer
-                ft.Text("Age:", size=16, color=ft.colors.BLACK87),
-                self.age,
-                ft.Container(height=20),  # Spacer
-                ft.Text("Weight,kg:", size=16, color=ft.colors.BLACK87),
-                self.weight,
-                ft.Container(height=20),  # Spacer
-                ft.Text("Height,cm:", size=16, color=ft.colors.BLACK87),
-                self.height,
-                ft.Container(height=20),  # Spacer
-                ft.Text("Main sport:", size=16, color=ft.colors.BLACK87),
-                self.main_sport,
-                ft.Container(height=20),  # Spacer
-                self.your_goal,
-                ft.Container(height=20),
-                ft.Text("Times a week of training:", size=16, color=ft.colors.BLACK87),
-                self.training_times,
-                ft.Container(height=20),  # Spacer
-                self.allergies,
-                ft.Container(height=30),  # Spacer
-                self.save_button,
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,  # Center content vertically
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,  # Center content horizontally
-        )]
+        self.controls = [ft.AppBar(title=ft.Text("Parameters"), bgcolor=ft.colors.SURFACE_VARIANT),
+                         ft.Column(
+                             [
+                                 ft.Text("Your Parameters:", size=24, weight=ft.FontWeight.BOLD, color="#00796B"),
+                                 # Teal color for the title
+                                 ft.Container(height=10),  # Spacer
+                                 self.name,
+                                 ft.Container(height=10),  # Spacer
+                                 ft.Text("Age:", size=16, color=ft.colors.BLACK87),
+                                 self.age,
+                                 ft.Container(height=10),  # Spacer
+                                 ft.Text("Weight,kg:", size=16, color=ft.colors.BLACK87),
+                                 self.weight,
+                                 ft.Container(height=10),  # Spacer
+                                 ft.Text("Height,cm:", size=16, color=ft.colors.BLACK87),
+                                 self.height,
+                                 ft.Container(height=10),  # Spacer
+                                 ft.Text("Main sport:", size=16, color=ft.colors.BLACK87),
+                                 self.main_sport,
+                                 ft.Container(height=10),  # Spacer
+                                 self.your_goal,
+                                 ft.Container(height=10),
+                                 ft.Text("Times a week of training:", size=16, color=ft.colors.BLACK87),
+                                 self.training_times,
+                                 ft.Container(height=10),  # Spacer
+                                 self.allergies,
+                                 ft.Container(height=30),  # Spacer
+                                 self.save_button,
+                             ],
+                             alignment=ft.MainAxisAlignment.CENTER,  # Center content vertically
+                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,  # Center content horizontally
+                         )]
 
     def set_main_sport_value(self, e):
         self.main_sport_value = e.selection
@@ -184,7 +186,7 @@ class ParameterPage(ft.View):
         self.page.client_storage.set("height", int(self.height_value.value))
         self.page.client_storage.set("mainsport", self.main_sport_value)
         self.page.client_storage.set("goal", self.your_goal.value)
-        self.page.client_storage.set("training times", int(self.training_times_value.value))
+        self.page.client_storage.set("training_times", int(self.training_times_value.value))
         self.page.client_storage.set("allergies", self.allergies.value)
         self.page.go("/")
 
