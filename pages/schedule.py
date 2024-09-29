@@ -123,7 +123,7 @@ class SchedulePage(ft.View):
             ], alignment=ft.MainAxisAlignment.CENTER),
             schedule_view,
             ft.FloatingActionButton(icon=ft.icons.ADD, on_click=add_new_item),
-            ft.AppBar(title=ft.Text("Schedule"), bgcolor="#16E3AF"),
+            ft.AppBar(title=ft.Text("Schedule"), bgcolor="#16E3AF", color=ft.colors.WHITE,),
             self.navbar
         ]
 
