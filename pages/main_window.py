@@ -8,6 +8,6 @@ class MainWindowPage(ft.View):
         self.navbar = navbar
 
         self.controls = [
-            ft.AppBar(title=ft.Text("Main Window"), bgcolor=ft.colors.SURFACE_VARIANT),
+            ft.AppBar(title=ft.Text("Main Window"), bgcolor="#16E3AF"),
             self.navbar
         ]
