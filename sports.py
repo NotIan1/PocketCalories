@@ -24,5 +24,6 @@ SPORTS = {
     "Dance": {"low": 60, "high": 80, "average": 70},
     "Gymnastics": {"low": 75, "high": 90, "average": 83},
     "Squash": {"low": 80, "high": 90, "average": 85},
-    "Other": {"low": "Varies", "high": "Varies", "average": "Varies"}
+    "Other": {"low": "Varies", "high": "Varies", "average": "Varies"},
+    "No Sport": {"low": 0, "high": 0, "average": 0},
 }

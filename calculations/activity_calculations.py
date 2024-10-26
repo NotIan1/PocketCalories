@@ -69,14 +69,14 @@ def calculate_calories(age, weight, height, sport, intensity, weight_goal, gende
 
 
 if __name__ == '__main__':
-    age = 13
-    weight = 55  # kg
-    height = 170  # cm
-    sport = "Swimming"
+    age = 40
+    weight = 90 # kg
+    height = 176 # cm
+    sport = "No Sport"
     intensity = "high"
     weight_goal = "stay the same"  # Can be "cut", "bulk", or "stay the same"
     gender = "male"
-    sessions_per_week = 6
+    sessions_per_week = 0
     additional_activity = "lightly active"
 
     calories_needed = calculate_calories(age, weight, height, sport, intensity, weight_goal, gender, sessions_per_week,additional_activity)

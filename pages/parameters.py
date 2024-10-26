@@ -97,6 +97,28 @@ class ParameterPage(ft.View):
                 padding=10,
             ),
         )
+        self.gender = ft.Dropdown(
+            label="Gender:",
+            options=[
+                ft.dropdown.Option("Male"),
+                ft.dropdown.Option("Female"),
+            ],
+            width=300,
+            on_change=self.validate_form
+        )
+
+        # Activity Level Dropdown
+        self.activity_level = ft.Dropdown(
+            label="Activity Level:",
+            options=[
+                ft.dropdown.Option("Sedentary"),
+                ft.dropdown.Option("Lightly Active"),
+                ft.dropdown.Option("Active"),
+                ft.dropdown.Option("Highly Active"),
+            ],
+            width=300,
+            on_change=self.validate_form
+        )
 
         self.scroll = ft.ScrollMode.ALWAYS
 
