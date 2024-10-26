@@ -1,4 +1,5 @@
-from sports import SPORTS
+from data.sports import SPORTS
+from data.user_params import Gender, Goal, ActivityLevel
 
 
 def calculate_activity_factor(sessions_per_week, sport, sport_intensity, additional_activity):
@@ -19,13 +20,13 @@ def calculate_activity_factor(sessions_per_week, sport, sport_intensity, additio
     adjusted_factor = base_factor * (1 + (intensity_factor - 0.5) / 2)
 
     # Step 3: Adjust based on Additional Activity
-    if additional_activity == "sedentary":
+    if additional_activity == ActivityLevel.SEDENTARY:
         additional_activity_adjustment = 0  # No change
-    elif additional_activity == "lightly active":
+    elif additional_activity == ActivityLevel.LIGHTLY_ACTIVE:
         additional_activity_adjustment = 0.05
-    elif additional_activity == "active":
+    elif additional_activity == ActivityLevel.ACTIVE:
         additional_activity_adjustment = 0.1
-    elif additional_activity == "highly active":
+    elif additional_activity == ActivityLevel.HIGHLY_ACTIVE:
         additional_activity_adjustment = 0.2
     else:
         additional_activity_adjustment = 0  # Default to no change if input is unexpected
@@ -35,36 +36,36 @@ def calculate_activity_factor(sessions_per_week, sport, sport_intensity, additio
     return final_activity_factor
 
 def calculate_bmr(age, weight, height, gender):
-    if gender == "male":
+    if gender == Gender.MALE:
         return 10 * weight + 6.25 * height - 5 * age + 5
-    elif gender == "female":
+    elif gender == Gender.FEMALE:
         return 10 * weight + 6.25 * height - 5 * age - 161
 
 
 def adjust_for_goal(calories, weight_goal):
-    if weight_goal == "bulk":
+    if weight_goal == Goal.BULK:
         return calories + 300  # Add extra calories for bulking
-    elif weight_goal == "cut":
+    elif weight_goal == Goal.CUT:
         return calories - 500  # Subtract calories for cutting
     else:
         return calories  # No adjustment for maintenance
 
 
-def calculate_calories(age, weight, height, sport, intensity, weight_goal, gender, sessions_per_week,
-                       additional_activity):
+def calculate_calories(age, weight, height, main_sport, intensity, goal, gender, training_times,
+                       activity_level, **kwargs):
     # Step 1: Calculate BMR
     bmr = calculate_bmr(age, weight, height, gender)
 
     # Step 2: Calculate activity factor
-    activity_factor = calculate_activity_factor(sessions_per_week, sport, intensity, additional_activity)
+    activity_factor = calculate_activity_factor(training_times, main_sport, intensity, activity_level)
 
     # Step 3: Adjust BMR for activity
     tdee = bmr * activity_factor
 
     # Step 4: Adjust for weight goal (cutting, bulking, or maintaining)
-    final_calories = adjust_for_goal(tdee, weight_goal)
+    final_calories = adjust_for_goal(tdee, goal)
 
-    return round(final_calories)
+    return int(round(final_calories / 10) * 10)
 
 
 

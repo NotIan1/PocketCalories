@@ -1,3 +1,7 @@
+from dataclasses import dataclass
+from enum import Enum
+
+
 SPORTS = {
     "Swimming": {"low": 70, "high": 90, "average": 80},
     "Running": {"low": 70, "high": 85, "average": 78},

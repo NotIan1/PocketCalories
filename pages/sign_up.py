@@ -103,8 +103,8 @@ def main(page: ft.Page):
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.theme_mode = ft.ThemeMode.LIGHT
-    page.window_width = 400
-    page.window_height = 400
+    page.window.width = 400
+    page.window.height = 400
     page.window_resizable = False
     page.bgcolor = "#F0F4FF"  # Light blue background color
 

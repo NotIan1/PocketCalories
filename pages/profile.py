@@ -1,6 +1,8 @@
+from enum import Enum
+
 import flet as ft
 
-from sports import SPORTS
+from data.user_params import UserParameters
 
 
 class ProfilePage(ft.View):
@@ -8,6 +10,7 @@ class ProfilePage(ft.View):
         super().__init__(route='/profile', padding=20)
         self.page = page  # сохранить переменную в классе
         self.navbar = navbar
+        self.user_params = UserParameters.create(page)
 
         # Profile picture
         self.profile_picture = ft.Container(
@@ -23,11 +26,13 @@ class ProfilePage(ft.View):
         self.name_display = ft.Text("Name: ", size=18, weight=ft.FontWeight.BOLD)
         self.info_items = [
             ("Age", "age", "years"),
+            ("Gender", "gender", ""),
             ("Weight", "weight", "kg"),
             ("Height", "height", "cm"),
-            ("Main sport", "mainsport", ""),
+            ("Main sport", "main_sport", ""),
             ("Training frequency", "training_times", "times/week"),
             ("Goal", "goal", ""),
+            ("Activity level", "activity_level", ""),
             ("Allergies", "allergies", ""),
         ]
         self.info_displays = {key: ft.Text(f"{label}: ", size=16) for label, key, _ in self.info_items}
@@ -37,14 +42,14 @@ class ProfilePage(ft.View):
 
         # Layout
         self.controls = [
-            ft.AppBar(title=ft.Text("My Profile"), bgcolor="#16E3AF", color=ft.colors.WHITE,                 actions=[
-                    ft.IconButton(
-                        icon=ft.icons.EDIT,
-                        icon_color=ft.colors.WHITE,
-                        tooltip="Edit Profile",
-                        on_click=self.go_to_parameters
-                    )
-                ]),
+            ft.AppBar(title=ft.Text("My Profile"), bgcolor="#16E3AF", color=ft.colors.WHITE, actions=[
+                ft.IconButton(
+                    icon=ft.icons.EDIT,
+                    icon_color=ft.colors.WHITE,
+                    tooltip="Edit Profile",
+                    on_click=self.go_to_parameters
+                )
+            ]),
             ft.Container(
                 content=ft.Column([
                     ft.Container(content=self.profile_picture, alignment=ft.alignment.center),
@@ -84,12 +89,12 @@ class ProfilePage(ft.View):
         ], alignment=ft.MainAxisAlignment.CENTER)
 
     def load_data_from_storage(self):
-        self.name_display.value = self.page.client_storage.get('name')
-        for label, key, unit in self.info_items:
-            value = self.page.client_storage.get(key)
+        self.name_display.value = self.user_params.name
+        for label, key, _ in self.info_items:
+            value = getattr(self.user_params, key)
+            if isinstance(value, Enum):
+                value = value.value
             self.info_displays[key].value = f"{value}"
 
     def go_to_parameters(self, e):
         self.page.go('/parameters')
-
-        # Profile picture

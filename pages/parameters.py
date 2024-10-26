@@ -1,20 +1,35 @@
 import flet as ft
+from anyio import value
 
-from sports import SPORTS
+from data.sports import SPORTS
+from data.user_params import UserParameters, Goal, Gender, ActivityLevel
 
 
+# noinspection PyUnresolvedReferences
 class ParameterPage(ft.View):
     def __init__(self, page):
         """Initializes the ParameterPage."""
         super().__init__(route='/parameters', padding=20)
         self.page = page
+        self.user_params = UserParameters.create(page)
 
         self.main_sport_value = None
 
         # Define input fields (keeping the existing fields, just adjusted for compactness)
-        self.name = ft.TextField(label="Name:", width=300, on_change=self.validate_form)
+        self.name = ft.TextField(label="Name:", value=self.user_params.name,
+                                 width=300, on_change=self.validate_form)
 
-        self.age_value = ft.TextField(value="0", width=60, on_change=self.validate_form, text_align=ft.TextAlign.CENTER)
+        self.gender = ft.Dropdown(
+            label="Gender:",
+            value=self.user_params.gender.value,
+            options=[ft.dropdown.Option(gender.value) for gender in Gender],
+            width=300,
+            on_change=self.validate_form
+        )
+
+        self.age_value = ft.TextField(value=str(self.user_params.age),
+                                      width=60, on_change=self.validate_form,
+                                      text_align=ft.TextAlign.CENTER)
         self.age = ft.Row(
             [
                 ft.IconButton(ft.icons.REMOVE, on_click=lambda _: self.decrement(self.age_value),
@@ -26,7 +41,8 @@ class ParameterPage(ft.View):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        self.weight_value = ft.TextField(value="0", width=60, on_change=self.validate_form,
+        self.weight_value = ft.TextField(value=str(self.user_params.weight), width=60,
+                                         on_change=self.validate_form,
                                          text_align=ft.TextAlign.CENTER)
         self.weight = ft.Row(
             [
@@ -39,7 +55,8 @@ class ParameterPage(ft.View):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        self.height_value = ft.TextField(value="0", width=60, on_change=self.validate_form,
+        self.height_value = ft.TextField(value=str(self.user_params.height), width=60,
+                                         on_change=self.validate_form,
                                          text_align=ft.TextAlign.CENTER)
         self.height = ft.Row(
             [
@@ -52,7 +69,8 @@ class ParameterPage(ft.View):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        self.training_times_value = ft.TextField(value="0", width=60, on_change=self.validate_form,
+        self.training_times_value = ft.TextField(value=str(self.user_params.training_times),
+                                                 width=60, on_change=self.validate_form,
                                                  text_align=ft.TextAlign.CENTER)
         self.training_times = ft.Row(
             [
@@ -73,17 +91,25 @@ class ParameterPage(ft.View):
 
         self.your_goal = ft.Dropdown(
             label="Your Goal:",
-            options=[
-                ft.dropdown.Option("Cut"),
-                ft.dropdown.Option("Bulk"),
-                ft.dropdown.Option("Stay the same weight"),
-                ft.dropdown.Option("No goals yet"),
-            ],
+            value=self.user_params.goal.value,
+            options=[ft.dropdown.Option(goal.value) for goal in Goal],
             width=300,
             on_change=self.validate_form
         )
 
-        self.allergies = ft.TextField(label="Allergies: *", width=300, bgcolor=ft.colors.GREY)  # Optional field
+        # Activity Level Dropdown
+        self.activity_level = ft.Dropdown(
+            label="Activity Level:",
+            value=self.user_params.activity_level.value,
+            options=[ft.dropdown.Option(activity.value) for activity in ActivityLevel],
+            width=300,
+            on_change=self.validate_form
+        )
+
+        # Optional field
+        self.allergies = ft.TextField(label="Allergies: *",
+                                      value=', '.join(self.user_params.allergies),
+                                      width=300, bgcolor=ft.colors.GREY)
 
         self.save_button = ft.ElevatedButton(
             "Save",
@@ -97,39 +123,19 @@ class ParameterPage(ft.View):
                 padding=10,
             ),
         )
-        self.gender = ft.Dropdown(
-            label="Gender:",
-            options=[
-                ft.dropdown.Option("Male"),
-                ft.dropdown.Option("Female"),
-            ],
-            width=300,
-            on_change=self.validate_form
-        )
-
-        # Activity Level Dropdown
-        self.activity_level = ft.Dropdown(
-            label="Activity Level:",
-            options=[
-                ft.dropdown.Option("Sedentary"),
-                ft.dropdown.Option("Lightly Active"),
-                ft.dropdown.Option("Active"),
-                ft.dropdown.Option("Highly Active"),
-            ],
-            width=300,
-            on_change=self.validate_form
-        )
 
         self.scroll = ft.ScrollMode.ALWAYS
 
         # Assemble the page layout
-        self.controls = [ft.AppBar(title=ft.Text("Parameters"), bgcolor=ft.colors.SURFACE_VARIANT),
+        self.controls = [ft.AppBar(title=ft.Text("Parameters"), bgcolor="#16E3AF", color=ft.colors.WHITE),
                          ft.Column(
                              [
                                  ft.Text("Your Parameters:", size=24, weight=ft.FontWeight.BOLD, color="#00796B"),
                                  # Teal color for the title
                                  ft.Container(height=10),  # Spacer
                                  self.name,
+                                 ft.Container(height=10),
+                                 self.gender,
                                  ft.Container(height=10),  # Spacer
                                  ft.Text("Age:", size=16, color=ft.colors.BLACK87),
                                  self.age,
@@ -147,6 +153,8 @@ class ParameterPage(ft.View):
                                  ft.Container(height=10),
                                  ft.Text("Times a week of training:", size=16, color=ft.colors.BLACK87),
                                  self.training_times,
+                                 ft.Container(height=10),
+                                 self.activity_level,
                                  ft.Container(height=10),  # Spacer
                                  self.allergies,
                                  ft.Container(height=30),  # Spacer
@@ -158,6 +166,7 @@ class ParameterPage(ft.View):
 
     def set_main_sport_value(self, e):
         self.main_sport_value = e.selection
+        self.validate_form(e)
 
     def increment(self, text_ref):
         try:
@@ -202,14 +211,15 @@ class ParameterPage(ft.View):
         self.page.update()
 
     def submit(self, e) -> None:
-        self.page.client_storage.set("name", self.name.value)
-        self.page.client_storage.set("age", int(self.age_value.value))
-        self.page.client_storage.set("weight", int(self.weight_value.value))
-        self.page.client_storage.set("height", int(self.height_value.value))
-        self.page.client_storage.set("mainsport", self.main_sport_value)
-        self.page.client_storage.set("goal", self.your_goal.value)
-        self.page.client_storage.set("training_times", int(self.training_times_value.value))
-        self.page.client_storage.set("allergies", self.allergies.value)
+        self.user_params.name = self.name.value
+        self.user_params.age = int(self.age_value.value)
+        self.user_params.weight = int(self.weight_value.value)
+        self.user_params.height = int(self.height_value.value)
+        self.user_params.main_sport = self.main_sport_value.value
+        self.user_params.goal = self.your_goal.value
+        self.user_params.training_times = int(self.training_times_value.value)
+        self.user_params.allergies = [allergy.strip() for allergy in self.allergies.value.split(",")]
+
         self.page.go("/")
 
 
@@ -218,8 +228,8 @@ def main(page: ft.Page):
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.bgcolor = "#E8F0F2"  # Light blue background color
-    page.window_width = 350
-    page.window_height = 1080
+    page.window.width = 350
+    page.window.height = 800
 
     # Create and center the ParameterPage content
     parameters = ParameterPage(page)
