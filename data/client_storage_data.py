@@ -62,7 +62,7 @@ class ClientStorageMetaclass(type):
                 if issubclass(field_type, Enum):
                     if not isinstance(value, field_type):
                         value = field_type(value)
-                elif not isinstance(value, field_type):
+                elif not isinstance(value, list) and not isinstance(value, field_type):
                     try:
                         value = field_type(value)
                     except (ValueError, TypeError) as e:

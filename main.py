@@ -14,10 +14,10 @@ def main(page: ft.Page):
     page.adaptive = True
     navigation_bar = navbar(page)
 
+    page.client_storage.clear()
+
     def route_change(route):
         page.views.clear()
-        page.views.append(MainWindowPage(page, navigation_bar))
-
         if page.route == "/schedule":
             page.views.append(SchedulePage(page, navigation_bar))
 
@@ -28,6 +28,8 @@ def main(page: ft.Page):
 
         elif page.route == "/signup":
             page.views.append(SignupPage(page))
+        else:
+            page.views.append(MainWindowPage(page, navigation_bar))
 
         page.update()
 
