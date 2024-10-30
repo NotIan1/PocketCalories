@@ -1,4 +1,5 @@
 import flet as ft
+from flet_core import NavigationBar
 
 
 def navbar(page):

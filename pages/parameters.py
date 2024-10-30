@@ -1,19 +1,18 @@
 import flet as ft
 from anyio import value
 
-from data.sports import SPORTS
+from calculations.activity_calculations import calculate_calories
+from data.sports import SPORTS, Sport
 from data.user_params import UserParameters, Goal, Gender, ActivityLevel
+from widgets.sport_selector import SportSelector
 
 
-# noinspection PyUnresolvedReferences
 class ParameterPage(ft.View):
     def __init__(self, page):
         """Initializes the ParameterPage."""
         super().__init__(route='/parameters', padding=20)
         self.page = page
         self.user_params = UserParameters.create(page)
-
-        self.main_sport_value = None
 
         # Define input fields (keeping the existing fields, just adjusted for compactness)
         self.name = ft.TextField(label="Name:", value=self.user_params.name,
@@ -83,11 +82,7 @@ class ParameterPage(ft.View):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        self.main_sport = ft.Container(content=ft.AutoComplete(
-            suggestions=[ft.AutoCompleteSuggestion(key=f"{sport.lower()} {sport}", value=sport) for sport in SPORTS],
-            on_select=self.set_main_sport_value
-        ),
-            width=300)
+        self.main_sport = SportSelector(value=str(self.user_params.main_sport or ""))
 
         self.your_goal = ft.Dropdown(
             label="Your Goal:",
@@ -164,10 +159,6 @@ class ParameterPage(ft.View):
                              horizontal_alignment=ft.CrossAxisAlignment.CENTER,  # Center content horizontally
                          )]
 
-    def set_main_sport_value(self, e):
-        self.main_sport_value = e.selection
-        self.validate_form(e)
-
     def increment(self, text_ref):
         try:
             text_ref.value = str(int(text_ref.value) + 1)
@@ -196,7 +187,7 @@ class ParameterPage(ft.View):
                 int(self.age_value.value) > 0,
                 int(self.weight_value.value) > 0,
                 int(self.height_value.value) > 0,
-                self.main_sport_value,
+                self.main_sport.value,
                 self.your_goal.value,
                 int(self.training_times_value.value) > 0,
                 # self.allergies.value.strip()  # Included in validation
@@ -215,10 +206,12 @@ class ParameterPage(ft.View):
         self.user_params.age = int(self.age_value.value)
         self.user_params.weight = int(self.weight_value.value)
         self.user_params.height = int(self.height_value.value)
-        self.user_params.main_sport = self.main_sport_value.value
+        self.user_params.main_sport = self.main_sport.sport
         self.user_params.goal = self.your_goal.value
         self.user_params.training_times = int(self.training_times_value.value)
         self.user_params.allergies = [allergy.strip() for allergy in self.allergies.value.split(",")]
+
+        self.page.client_storage.set("calories_needed", calculate_calories(intensity="average", **self.user_params.to_dict()))
 
         self.page.go("/")
 

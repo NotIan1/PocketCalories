@@ -4,10 +4,9 @@ import flet as ft
 
 
 class SchedulePage(ft.View):
-    def __init__(self, page, navbar):
+    def __init__(self, page):
         super().__init__(route='/schedule', padding=20)
         self.page = page
-        self.navbar = navbar
 
         planner = WeeklyPlanner()
 
@@ -124,8 +123,8 @@ class SchedulePage(ft.View):
             schedule_view,
             ft.FloatingActionButton(icon=ft.icons.ADD, on_click=add_new_item),
             ft.AppBar(title=ft.Text("Schedule"), bgcolor="#16E3AF", color=ft.colors.WHITE,),
-            self.navbar
         ]
+        self.navigation_bar = self.page.navigation_bar
 
         update_schedule_view()
 

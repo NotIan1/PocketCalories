@@ -1,6 +1,7 @@
 
 import flet as ft
 
+from data.user_params import UserParameters
 from navbar import navbar
 from pages.parameters import ParameterPage
 from pages.profile import ProfilePage
@@ -13,25 +14,28 @@ def main(page: ft.Page):
     page.title = "Pocket calories"  # app title
     page.adaptive = True
     navigation_bar = navbar(page)
+    page.navigation_bar = navigation_bar
 
-    page.client_storage.clear()
+    # page.client_storage.clear()
 
     def route_change(route):
+
         page.views.clear()
-        # page.views.append(MainWindowPage(page, navigation_bar))
+        navigation_bar.selected_index = 0
+        page.views.append(MainWindowPage(page))
 
-        if page.route == "/schedule":
-            page.views.append(SchedulePage(page, navigation_bar))
+        troute = page.route
 
-        elif page.route == "/profile":
-            page.views.append(ProfilePage(page, navigation_bar))
-        elif page.route == "/parameters":
-            page.views.append(ParameterPage(page))
-
-        elif page.route == "/signup":
+        if troute == "/signup":
             page.views.append(SignupPage(page))
-        else:
-            page.views.append(MainWindowPage(page, navigation_bar))
+        elif troute == "/parameters":
+            page.views.append(ParameterPage(page))
+        elif troute == "/schedule":
+            navigation_bar.selected_index = 1
+            page.views.append(SchedulePage(page))
+        elif troute == "/profile":
+            navigation_bar.selected_index = 2
+            page.views.append(ProfilePage(page))
 
         page.update()
 
@@ -46,7 +50,7 @@ def main(page: ft.Page):
     
     if not page.client_storage.get('username'):
         page.go('/signup')
-    elif not page.client_storage.get('name'):
+    elif not UserParameters.create(page):
         page.go('/parameters')
     else:
         page.go('/')

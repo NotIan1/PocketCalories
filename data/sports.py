@@ -2,6 +2,18 @@ from dataclasses import dataclass
 from enum import Enum
 
 
+class SportIntensity(str, Enum):
+    LOW, AVERAGE, HIGH = "low", "average", "high"
+
+@dataclass
+class Sport:
+    name: str
+    intensities: dict[SportIntensity, float]
+
+    def __str__(self):
+        return self.name
+
+
 SPORTS = {
     "Swimming": {"low": 70, "high": 90, "average": 80},
     "Running": {"low": 70, "high": 85, "average": 78},
@@ -28,6 +40,5 @@ SPORTS = {
     "Dance": {"low": 60, "high": 80, "average": 70},
     "Gymnastics": {"low": 75, "high": 90, "average": 83},
     "Squash": {"low": 80, "high": 90, "average": 85},
-    "Other": {"low": "Varies", "high": "Varies", "average": "Varies"},
     "No Sport": {"low": 0, "high": 0, "average": 0},
 }

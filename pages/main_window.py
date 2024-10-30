@@ -5,14 +5,13 @@ from data.user_params import UserParameters
 
 
 class MainWindowPage(ft.View):
-    def __init__(self, page, navbar):
+    def __init__(self, page):
         super().__init__(route='/', padding=20)
         self.page = page
-        self.navbar = navbar
         self.user_params = UserParameters.create(page)
 
         # Calculate calories based on parameters stored in client_storage
-        self.calories_needed = self.calculate_needed_calories()
+        self.calories_needed = self.page.client_storage.get("calories_needed") or 0
 
         # Display calories
         self.calories_text = ft.Text(
@@ -24,10 +23,7 @@ class MainWindowPage(ft.View):
         # Page controls
         self.controls = [
             ft.AppBar(title=ft.Text("Main Window"), bgcolor="#16E3AF", color=ft.colors.WHITE),
-            self.navbar,
             self.calories_text  # Add calories information to the display
         ]
 
-    def calculate_needed_calories(self):
-        # Calculate and return calories
-        return calculate_calories(intensity="average", **self.user_params.to_dict())
+        self.navigation_bar = self.page.navigation_bar

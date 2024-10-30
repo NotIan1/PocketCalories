@@ -6,10 +6,9 @@ from data.user_params import UserParameters
 
 
 class ProfilePage(ft.View):
-    def __init__(self, page, navbar):
+    def __init__(self, page):
         super().__init__(route='/profile', padding=20)
         self.page = page  # сохранить переменную в классе
-        self.navbar = navbar
         self.user_params = UserParameters.create(page)
 
         # Profile picture
@@ -74,8 +73,8 @@ class ProfilePage(ft.View):
                     offset=ft.Offset(0, 0),
                 )
             ),
-            self.navbar
         ]
+        self.navigation_bar = self.page.navigation_bar
 
     def create_info_row(self, label, key, unit):
         return ft.Row([
@@ -94,7 +93,9 @@ class ProfilePage(ft.View):
             value = getattr(self.user_params, key)
             if isinstance(value, Enum):
                 value = value.value
-            self.info_displays[key].value = f"{value}"
+            if isinstance(value, list):
+                value = ', '.join(value)
+            self.info_displays[key].value = str(value)
 
     def go_to_parameters(self, e):
         self.page.go('/parameters')

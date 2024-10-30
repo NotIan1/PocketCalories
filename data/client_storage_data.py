@@ -1,3 +1,4 @@
+import dataclasses
 import typing
 from enum import Enum
 from typing import get_type_hints, Type, Any
@@ -40,6 +41,30 @@ class ClientStorageMetaclass(type):
         elif t == bool:
             return False
         return None
+
+    @staticmethod
+    def is_default_value(value: Any, type_: Type) -> bool:
+        """Проверяет, является ли значение значением по умолчанию для данного типа"""
+        default = ClientStorageMetaclass.get_default(type_)
+
+        # Для списков проверяем на пустоту
+        if typing.get_origin(type_) is list:
+            return len(value) == 0
+
+        # Для строк проверяем на пустоту
+        if type_ is str:
+            return not bool(value.strip())
+
+        # Для чисел проверяем на 0
+        if type_ in (int, float):
+            return value == 0
+
+        # Для Enum проверяем, является ли значение первым элементом enum
+        if issubclass(type_, Enum):
+            return value == list(type_)[0]
+
+        # Для остальных типов просто сравниваем с default
+        return value == default
 
     @staticmethod
     def validate_value(value: Any, expected_type: Type) -> Any:
@@ -89,6 +114,9 @@ class ClientStorageMetaclass(type):
                 # Преобразуем значение в правильный тип
                 if issubclass(field_type, Enum):
                     value = field_type(value) if value else mcs.get_default(field_type)
+                if dataclasses.is_dataclass(field_type):
+                    value = field_type(**value) if value else mcs.get_default(field_type)
+                # if issubclass(field_type, )
                 setattr(self, private_name, value)
             return getattr(self, private_name)
 
@@ -133,3 +161,16 @@ class ClientStorageClass(metaclass=ClientStorageMetaclass):
             for name in get_type_hints(self.__class__)
             if not name.startswith('__')
         }
+
+    def __bool__(self) -> bool:
+        """
+        Возвращает True, если хотя бы одно поле отличается от значения по умолчанию,
+        False - если все поля имеют значения по умолчанию
+        """
+        for field_name, field_type in get_type_hints(self.__class__).items():
+            if field_name.startswith('_'):
+                continue
+            value = getattr(self, field_name)
+            if not self.__class__.__class__.is_default_value(value, field_type):
+                return True
+        return False
