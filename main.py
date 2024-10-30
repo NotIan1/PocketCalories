@@ -20,13 +20,15 @@ def main(page: ft.Page):
 
     def route_change(route):
 
-        page.views.clear()
-        navigation_bar.selected_index = 0
-        page.views.append(MainWindowPage(page))
+        # page.views.clear()
+        # navigation_bar.selected_index = 0
+        # page.views.append(MainWindowPage(page))
 
         troute = page.route
-
-        if troute == "/signup":
+        if troute == '/':
+            navigation_bar.selected_index = 0
+            page.views.append(MainWindowPage(page))
+        elif troute == "/signup":
             page.views.append(SignupPage(page))
         elif troute == "/parameters":
             page.views.append(ParameterPage(page))
@@ -41,8 +43,7 @@ def main(page: ft.Page):
 
     def view_pop(view):
         page.views.pop()
-        top_view = page.views[-1]
-        navigation_bar.selected_index = 0
+        top_view = page.views.pop()
         page.go(top_view.route)
 
     page.on_route_change = route_change

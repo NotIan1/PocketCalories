@@ -1,6 +1,5 @@
 import flet as ft
 
-from calculations.activity_calculations import calculate_calories
 from data.user_params import UserParameters
 
 
