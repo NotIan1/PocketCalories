@@ -1,3 +1,4 @@
+import typing
 from enum import Enum
 from typing import get_type_hints, Type, Any
 
@@ -40,6 +41,41 @@ class ClientStorageMetaclass(type):
             return False
         return None
 
+    @staticmethod
+    def validate_value(value: Any, expected_type: Type) -> Any:
+        """Проверяет и преобразует значение в правильный тип"""
+        # Получаем базовый тип и аргументы типа
+        origin_type = typing.get_origin(expected_type)
+        type_args = typing.get_args(expected_type)
+
+        # Для списков
+        if origin_type is list:
+            if not isinstance(value, list):
+                value = list(value) if value is not None else []
+            # Если есть тип элементов списка, проверяем каждый элемент
+            if type_args:
+                element_type = type_args[0]
+                value = [
+                    element_type(item) if not isinstance(item, element_type) else item
+                    for item in value
+                ]
+            return value
+
+        # Для Enum
+        if expected_type is not None and issubclass(expected_type, Enum):
+            return expected_type(value) if not isinstance(value, expected_type) else value
+
+        # Для простых типов
+        if expected_type is not None and not isinstance(value, expected_type):
+            try:
+                return expected_type(value)
+            except (ValueError, TypeError) as e:
+                raise TypeError(
+                    f"Expected {expected_type.__name__}, got {type(value).__name__}: {e}"
+                )
+
+        return value
+
     @classmethod
     def create_property(mcs, field_name: str, field_type: Type) -> property:
         """Создает property для заданного поля"""
@@ -57,24 +93,13 @@ class ClientStorageMetaclass(type):
             return getattr(self, private_name)
 
         def setter(self, value):
-            # Валидация типа
-            if value is not None:
-                if issubclass(field_type, Enum):
-                    if not isinstance(value, field_type):
-                        value = field_type(value)
-                elif not isinstance(value, field_type):
-                    try:
-                        value = field_type(value)
-                    except (ValueError, TypeError) as e:
-                        raise TypeError(
-                            f"Expected {field_type.__name__}, got {type(value).__name__}: {e}"
-                        )
+            # Валидация и преобразование типа
+            validated_value = mcs.validate_value(value, field_type)
+            setattr(self, private_name, validated_value)
 
-            setattr(self, private_name, value)
-            self._client_storage.set(
-                field_name,
-                value if not isinstance(value, Enum) else value.value
-            )
+            # Для Enum сохраняем значение, для остальных типов - сам объект
+            storage_value = validated_value.value if isinstance(validated_value, Enum) else validated_value
+            self._client_storage.set(field_name, storage_value)
 
         return property(getter, setter)
 
