@@ -3,6 +3,7 @@ import flet as ft
 
 from data.user_params import UserParameters
 from navbar import navbar
+from pages.dish import DishPage
 from pages.parameters import ParameterPage
 from pages.profile import ProfilePage
 from pages.schedule import SchedulePage
