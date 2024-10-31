@@ -27,6 +27,7 @@ def main(page: ft.Page):
 
         troute = page.route
         if troute == '/':
+            page.views.clear()
             navigation_bar.selected_index = 0
             page.views.append(MainWindowPage(page))
         elif troute == "/signup":
@@ -39,6 +40,11 @@ def main(page: ft.Page):
         elif troute == "/profile":
             navigation_bar.selected_index = 2
             page.views.append(ProfilePage(page))
+        elif troute.startswith('/dish'):
+            # Extract the dish name from route parameters (if passed)
+            dish_name = troute.split("=")[1] if "=" in troute else "Dish"
+            # page.views.clear()
+            page.views.append(DishPage(page, dish_name=dish_name))
 
         page.update()
 
