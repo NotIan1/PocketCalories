@@ -5,14 +5,13 @@ import flet as ft
 from data.sports import SPORTS, Sport
 
 
-class SportSelector(ft.Row):
+class SportSelector(ft.Container):
     def __init__(
             self,
             value: str = "",
             on_change: Callable[[str], None] | None = None,
             on_add_new_sport: Callable[[str, dict], None] | None = None
     ):
-        super().__init__()
         self.value = value
         self.intensities = {}
         self.on_change = on_change
@@ -29,22 +28,33 @@ class SportSelector(ft.Row):
         self.error_text_sliders = ft.Ref[ft.Text]()
         self.icon_button = ft.Ref[ft.IconButton]()
 
-        self.controls = [
-            ft.TextField(
-                ref=self.text_field,
-                value=self.value,
-                width=250,
-                text_align=ft.TextAlign.CENTER,
-                read_only=True,
-                border_color="transparent",
-                hint_text="Выберите спорт" if not self.value else None,
-            ),
-            ft.IconButton(
-                ref=self.icon_button,
-                on_click=lambda _: self.show_sport_dialog()
-            )
-        ]
-        # self.alignment = ft.MainAxisAlignment.CENTER,  # центрирует внешний Row
+        super().__init__(bgcolor=ft.colors.GREY_200,
+                         border_radius=ft.border_radius.all(5),
+                         padding=5,
+                         # margin=5,
+                         content=ft.Row(
+                             alignment=ft.MainAxisAlignment.CENTER,
+                             controls=[
+                                 ft.TextField(
+                                     ref=self.text_field,
+                                     value=self.value,
+                                     width=230,
+                                     text_align=ft.TextAlign.CENTER,
+                                     read_only=True,
+                                     border_color="transparent",
+                                     hint_text="Выберите спорт" if not self.value else None,
+                                 ),
+                                 ft.IconButton(
+                                     ref=self.icon_button,
+                                     on_click=lambda _: self.show_sport_dialog()
+                                 )
+                             ]
+                         ),
+                         width=300)
+
+        # self.bgcolor = ft.colors.AMBER,
+        # self.border_radius = ft.border_radius.all(5),
+        # self.alignment = "center"  # центрирует внешний Row
         self.set_icon_button()
 
     @property
