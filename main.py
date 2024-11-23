@@ -3,6 +3,7 @@ import flet as ft
 
 from data.user_params import UserParameters
 from navbar import navbar
+from pages.add_new_dish import AddDishPage
 from pages.dish import DishPage
 from pages.parameters import ParameterPage
 from pages.profile import ProfilePage
@@ -45,6 +46,8 @@ def main(page: ft.Page):
             dish_name = troute.split("=")[1] if "=" in troute else "Dish"
             # page.views.clear()
             page.views.append(DishPage(page, dish_name=dish_name))
+        elif troute == '/add-dish':
+            page.views.append(AddDishPage(page))
 
         page.update()
 
@@ -55,7 +58,7 @@ def main(page: ft.Page):
 
     page.on_route_change = route_change
     page.on_view_pop = view_pop
-    
+
     if not page.client_storage.get('username'):
         page.go('/signup')
     elif not UserParameters.create(page):

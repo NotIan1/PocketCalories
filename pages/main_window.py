@@ -57,7 +57,7 @@ class MainWindowPage(ft.View):
         add_button = ft.IconButton(
             icon=ft.icons.ADD_CIRCLE,
             icon_size=50,
-            on_click=lambda _: print("Add custom dish clicked")
+            on_click=lambda _: self.page.go("/add-dish")  # Navigate to AddDishPage
         )
 
         # Arrange everything in a Column
