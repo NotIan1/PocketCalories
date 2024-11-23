@@ -4,8 +4,10 @@ import flet as ft
 from data.user_params import UserParameters
 from navbar import navbar
 from pages.add_new_dish import AddDishPage
+from pages.add_new_product import AddProductPage
 from pages.dish import DishPage
 from pages.parameters import ParameterPage
+from pages.products import ChooseProductsPage
 from pages.profile import ProfilePage
 from pages.schedule import SchedulePage
 from pages.main_window import MainWindowPage
@@ -48,6 +50,10 @@ def main(page: ft.Page):
             page.views.append(DishPage(page, dish_name=dish_name))
         elif troute == '/add-dish':
             page.views.append(AddDishPage(page))
+        elif troute == '/add-product':
+            page.views.append(AddProductPage(page))
+        elif troute == '/choose-products':
+            page.views.append(ChooseProductsPage(page))
 
         page.update()
 
