@@ -4,7 +4,7 @@
 `python -m doctest -v calculations/activity_calculations.py`
 
 # TODO:
-
+1. Search bar Product page, main page
 2. Вынести в отдельный компонент counter (+ 0 -)
 3. Все перевести на английский язык (Ян)
 4. Profile redesign
