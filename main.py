@@ -16,6 +16,7 @@ from pages.sign_up import SignupPage
 
 def main(page: ft.Page):
     page.title = "Pocket calories"  # app title
+    page.theme = ft.Theme(color_scheme_seed="#16E3AF")
     page.adaptive = True
     navigation_bar = navbar(page)
     page.navigation_bar = navigation_bar

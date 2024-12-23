@@ -53,6 +53,10 @@ class ChooseProductsPage(ft.View):
 
         # Create a scrollable layout
         self.controls = [
+            ft.AppBar(
+                title=ft.Text("Products", color=ft.colors.ON_PRIMARY),
+                bgcolor=ft.colors.PRIMARY
+            ),
             ft.ListView(
                 controls=[
                     ft.Row([self.title, self.search_bar], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
@@ -139,13 +143,50 @@ class ChooseProductsPage(ft.View):
         return categories
 
     def filter_products(self, e):
-        """Filter products based on the search bar input."""
+        """Filter products based on the search bar input and dynamically update the UI."""
         query = e.control.value.lower()
-        for category in self.categories:
-            filtered_products = [
-                card for card in self.categories[category]
-                if query in card.content.controls[1].value.lower()  # Check product name
-            ]
-            self.categories[category] = filtered_products  # Update category controls
+
+        # Re-load products and filter them based on the search query
+        connection = sqlite3.connect("database/recipe_database.db")
+        cursor = connection.cursor()
+        cursor.execute("SELECT name, category, image FROM products")
+        database_products = cursor.fetchall()
+
+        filtered_categories = {}
+        for name, category, image in database_products:
+            if query in name.lower():  # Match search query in product name
+                if category not in filtered_categories:
+                    filtered_categories[category] = []
+                filtered_categories[category].append(self.create_product_card(name, image))
+        connection.close()
+
+        # Rebuild the category controls with filtered products
+        self.category_controls = [
+            ft.Column(
+                [
+                    ft.Text(category, size=20, weight=ft.FontWeight.BOLD, color=ft.colors.ON_SURFACE),
+                    ft.GridView(
+                        max_extent=180,
+                        spacing=15,
+                        run_spacing=15,
+                        controls=filtered_categories[category],
+                    ),
+                ],
+                spacing=10
+            )
+            for category in filtered_categories
+        ]
+
+        # Rebuild the UI layout
+        self.controls[1] = ft.ListView(
+            controls=[
+                ft.Row([self.title, self.search_bar], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                ft.Divider(color=ft.colors.OUTLINE),
+                *self.category_controls,
+                ft.Row([self.add_button], alignment=ft.MainAxisAlignment.END),
+            ],
+            expand=True,  # Ensures the scrollable area expands to fit available space
+            spacing=15
+        )
         self.page.update()
 

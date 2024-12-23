@@ -7,9 +7,6 @@ class AddProductPage(ft.View):
         self.page = page
         self.page.title = "Add New Product"
 
-        # Title Text
-        self.title_text = ft.Text("Add New Product", size=24, weight=ft.FontWeight.BOLD)
-
         # Input Fields
         self.product_name = ft.TextField(label="Name", width=400, border_radius=8)
 
@@ -62,7 +59,10 @@ class AddProductPage(ft.View):
 
         # Layout Arrangement
         self.controls = [
-            self.title_text,
+            ft.AppBar(
+                title=ft.Text("Add New Product", color=ft.colors.ON_PRIMARY),
+                bgcolor=ft.colors.PRIMARY
+            ),
             self.product_name,
             ft.Row([
                 ft.Column([self.image_upload_button, self.image_picker], width=220),

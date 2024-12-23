@@ -7,7 +7,6 @@ class AddDishPage(ft.View):
         self.page.title = "Add New Dish"
 
         # Title and Input Fields
-        self.title_text = ft.Text("Add New Dish", size=24, weight=ft.FontWeight.BOLD)
         self.dish_name = ft.TextField(label="Name", width=400, border_radius=8)
         self.description = ft.TextField(label="Description", multiline=True, width=400, border_radius=8)
         self.cooking_time = ft.TextField(label="Time to Make (e.g., 10-15 min)", width=400, border_radius=8)
@@ -53,7 +52,10 @@ class AddDishPage(ft.View):
 
         # Layout Arrangement
         self.controls = [
-            self.title_text,
+            ft.AppBar(
+                title=ft.Text("Add New Dish", color=ft.colors.ON_PRIMARY),
+                bgcolor=ft.colors.PRIMARY
+            ),
             self.dish_name,
             ft.Row([
                 ft.Column([self.image_upload_button, self.image_picker], width=220),
