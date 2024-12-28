@@ -44,7 +44,7 @@ class MainWindowPage(ft.View):
     def __init__(self, page):
         super().__init__(route='/', padding=20)
         self.page = page
-        self.page.theme_mode = ft.ThemeMode.DARK  # Enable dark mode
+        
         self.page.update()
 
         self.user_params = UserParameters.create(page)
@@ -120,7 +120,7 @@ class MainWindowPage(ft.View):
         self.controls = [
             ft.AppBar(
                 title=ft.Text("Main Window", color=ft.colors.ON_PRIMARY),
-                bgcolor=ft.colors.PRIMARY
+                bgcolor="#16E3AF"
             ),
             ft.Row([self.calories_text, self.lunchtime_text, self.search_bar]),
             ft.Text("Eat Now:", size=18, weight=ft.FontWeight.BOLD, color=ft.colors.ON_SURFACE),
