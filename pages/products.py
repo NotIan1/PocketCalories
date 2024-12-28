@@ -1,6 +1,9 @@
 import flet as ft
 import sqlite3
 
+from config import DATABASE_DIR, PRODUCTS_IMAGES_DIR
+
+
 class ChooseProductsPage(ft.View):
     def __init__(self, page):
         super().__init__(route='/choose-products', padding=20)
@@ -79,7 +82,7 @@ class ChooseProductsPage(ft.View):
         return ft.Container(
             content=ft.Column([
                 ft.Image(
-                    src='assets/products/' + image_path if image_path else "assets/products/default.png",
+                    src=PRODUCTS_IMAGES_DIR + image_path if image_path else "assets/products/default.png",
                     width=120, height=120, fit=ft.ImageFit.CONTAIN
                 ),
                 ft.Text(
@@ -126,7 +129,7 @@ class ChooseProductsPage(ft.View):
 
     def load_products_from_database(self):
         """Load product data from the database and categorize it."""
-        connection = sqlite3.connect("database/recipe_database.db")
+        connection = sqlite3.connect(DATABASE_DIR)
         cursor = connection.cursor()
         cursor.execute("SELECT name, category, image FROM products")
         database_products = cursor.fetchall()
@@ -147,7 +150,7 @@ class ChooseProductsPage(ft.View):
         query = e.control.value.lower()
 
         # Re-load products and filter them based on the search query
-        connection = sqlite3.connect("database/recipe_database.db")
+        connection = sqlite3.connect(DATABASE_DIR)
         cursor = connection.cursor()
         cursor.execute("SELECT name, category, image FROM products")
         database_products = cursor.fetchall()
