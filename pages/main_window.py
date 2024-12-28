@@ -1,5 +1,44 @@
 import flet as ft
 from data.user_params import UserParameters
+import sqlite3
+
+def get_all_recipes():
+    """
+    Query the 'recipes' table in the SQLite database and return two lists:
+    - main_recipes  (for meals)
+    - extra_recipes (for extras)
+    """
+    conn = sqlite3.connect("database/recipe_database.db")
+    c = conn.cursor()
+
+    # Example table schema:
+    #   CREATE TABLE recipes (
+    #       name TEXT,
+    #       calories INTEGER,
+    #       image_path TEXT,
+    #       is_extra INTEGER
+    #   );
+    #
+    #   is_extra could be 0 (false) or 1 (true)
+
+    c.execute("SELECT name, calories, image FROM Dishes")
+    rows = c.fetchall()
+
+    main_recipes = []
+    extra_recipes = []
+
+    for name, cal, img_path in rows:
+        # Convert DB row to a dict that matches your card creation
+        recipe_data = {
+            "title": name,
+            "calories": f"{cal} cal",   # e.g. "600 cal"
+            "image": img_path
+        }
+        main_recipes.append(recipe_data)
+
+    conn.close()
+    return main_recipes, extra_recipes
+
 
 class MainWindowPage(ft.View):
     def __init__(self, page):
@@ -7,6 +46,7 @@ class MainWindowPage(ft.View):
         self.page = page
         self.page.theme_mode = ft.ThemeMode.DARK  # Enable dark mode
         self.page.update()
+
         self.user_params = UserParameters.create(page)
         self.navigation_bar = self.page.navigation_bar
 
@@ -34,29 +74,36 @@ class MainWindowPage(ft.View):
             hint_style=ft.TextStyle(color=ft.colors.ON_SURFACE_VARIANT)
         )
 
-        # Placeholder for meal images in a grid layout with click event handlers
+        #
+        # 1. Fetch recipes from the DB
+        #
+        main_recipes, extra_recipes = get_all_recipes()
+
+        #
+        # 2. Create GridView for main recipes
+        #
         meal_items = ft.GridView(
             max_extent=150,  # size of each card
             padding=10,
             spacing=10,
             run_spacing=10,
             controls=[
-                self.create_meal_card("Pasta with sausages", "600 cal", "assets/pasta.png"),
-                self.create_meal_card("Buckwheat with bacon", "500 cal", "assets/buckwheat.png"),
-                self.create_meal_card("Rice with fish", "550 cal", "assets/rice.png"),
+                self.create_meal_card(r["title"], r["calories"], r["image"])
+                for r in main_recipes
             ]
         )
 
-        # Extra meals section
+        #
+        # 3. Create GridView for extras
+        #
         extra_items = ft.GridView(
             max_extent=100,
             padding=10,
             spacing=8,
             run_spacing=8,
             controls=[
-                self.create_extra_item("Carrots", "100 cal", "assets/carrots.png"),
-                self.create_extra_item("Protein bar", "200 cal", "assets/protein_bar.png"),
-                self.create_extra_item("Apples", "150 cal", "assets/apples.png"),
+                self.create_extra_item(r["title"], r["calories"], r["image"])
+                for r in extra_recipes
             ]
         )
 
@@ -88,10 +135,7 @@ class MainWindowPage(ft.View):
         return ft.Container(
             content=ft.Column([
                 ft.Image(src=image_path, width=100, height=80),
-                ft.Text(
-                    title, size=14, weight=ft.FontWeight.BOLD,
-                    color=ft.colors.ON_SURFACE
-                ),
+                ft.Text(title, size=14, weight=ft.FontWeight.BOLD, color=ft.colors.ON_SURFACE),
                 ft.Text(calories, size=12, color=ft.colors.ON_SURFACE_VARIANT),
                 ft.IconButton(
                     icon=ft.icons.CANCEL,
@@ -104,7 +148,7 @@ class MainWindowPage(ft.View):
             border_radius=8,
             border=ft.border.all(color=ft.colors.OUTLINE),
             bgcolor=ft.colors.SURFACE,
-            on_click=lambda e: self.open_dish_page(title)  # Navigate on click
+            on_click=lambda e: self.open_dish_page(title)
         )
 
     def create_extra_item(self, title, calories, image_path):
@@ -129,4 +173,4 @@ class MainWindowPage(ft.View):
 
     def open_dish_page(self, dish_name):
         """Navigate to the dish details page."""
-        self.page.go(f'/dish?name={dish_name}')
+        self.page.go(f"/dish?name={dish_name}")
