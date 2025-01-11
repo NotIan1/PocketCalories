@@ -11,11 +11,11 @@
 
 ## FIXME:
 
-2. кнопка back в изменении возвращает на главный экран, а не в профиль
 3. Parameters нельзя сохранить снова
 4. if allergies no - no show
 5. Schedule doesn't save
 4. Dark mode
+5. Theme
 
 Schedule
 1. 05:30 bug

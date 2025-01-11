@@ -1,8 +1,6 @@
 import flet as ft
-from anyio import value
 
 from calculations.activity_calculations import calculate_calories
-from data.sports import SPORTS, Sport
 from data.user_params import UserParameters, Goal, Gender, ActivityLevel
 from widgets.sport_selector import SportSelector
 
@@ -86,8 +84,8 @@ class ParameterPage(ft.View):
 
         self.your_goal = ft.Dropdown(
             label="Your Goal:",
-            value=self.user_params.goal.value,
-            options=[ft.dropdown.Option(goal.value) for goal in Goal],
+            value=self.user_params.goal,
+            options=[ft.dropdown.Option(goal) for goal in Goal],
             width=300,
             on_change=self.validate_form
         )

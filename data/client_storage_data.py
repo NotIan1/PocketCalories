@@ -112,7 +112,7 @@ class ClientStorageMetaclass(type):
                 if value is None:
                     value = mcs.get_default(field_type)
                 # Преобразуем значение в правильный тип
-                if issubclass(field_type, Enum):
+                if isinstance(field_type, Enum):
                     value = field_type(value) if value else mcs.get_default(field_type)
                 if dataclasses.is_dataclass(field_type):
                     value = field_type(**value) if value else mcs.get_default(field_type)
