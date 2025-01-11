@@ -56,18 +56,20 @@ class AddDishPage(ft.View):
                 title=ft.Text("Add New Dish", color=ft.colors.ON_PRIMARY),
                 bgcolor=ft.colors.PRIMARY
             ),
-            self.dish_name,
-            ft.Row([
-                ft.Column([self.image_upload_button, self.image_picker], width=220),
-                self.image_display
-            ]),
-            ft.Row([self.description, self.cooking_time]),
-            ft.Row([self.difficulty, self.calories]),
-            ft.Row([self.proteins, self.fats, self.carbs], spacing=10),
-            ft.Text("Ingredients", size=18, weight=ft.FontWeight.BOLD),
-            ft.Row([self.add_ingredient_button]),
-            self.ingredients_list,
-            ft.Row([self.save_button], alignment=ft.MainAxisAlignment.END),
+            ft.ListView(
+                expand=True,
+                controls=[
+                    self.dish_name,
+                    ft.Row([ft.Column([self.image_upload_button, self.image_picker], width=220), self.image_display]),
+                    ft.Row([self.description, self.cooking_time]),
+                    ft.Row([self.difficulty, self.calories]),
+                    ft.Row([self.proteins, self.fats, self.carbs], spacing=10),
+                    ft.Text("Ingredients", size=18, weight=ft.FontWeight.BOLD),
+                    ft.Row([self.add_ingredient_button]),
+                    self.ingredients_list,
+                    ft.Row([self.save_button], alignment=ft.MainAxisAlignment.END),
+                ]
+            )
         ]
 
     def upload_image(self, e: ft.FilePickerResultEvent):

@@ -41,39 +41,25 @@ class ProfilePage(ft.View):
 
         # Layout
         self.controls = [
-            ft.AppBar(title=ft.Text("My Profile"), bgcolor="#16E3AF", color=ft.colors.WHITE, actions=[
-                ft.IconButton(
-                    icon=ft.icons.EDIT,
-                    icon_color=ft.colors.WHITE,
-                    tooltip="Edit Profile",
-                    on_click=self.go_to_parameters
-                )
-            ]),
-            ft.Container(
-                content=ft.Column([
+            ft.AppBar(
+                title=ft.Text("My Profile"), bgcolor="#16E3AF", color=ft.colors.WHITE, actions=[
+                    ft.IconButton(icon=ft.icons.EDIT, icon_color=ft.colors.WHITE, tooltip="Edit Profile",
+                                  on_click=self.go_to_parameters)
+                ]
+            ),
+            ft.ListView(
+                expand=True,
+                controls=[
                     ft.Container(content=self.profile_picture, alignment=ft.alignment.center),
                     ft.Container(content=self.name_display, alignment=ft.alignment.center),
                     ft.Divider(height=2, color="#16E3AF"),
                     ft.Container(height=20),  # Spacer
-                    ft.Column([
-                        self.create_info_row(label, key, unit)
-                        for label, key, unit in self.info_items
-                    ]),
-                ],
-                    alignment=ft.MainAxisAlignment.START,
-                    horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
-                    spacing=10),
-                padding=20,
-                bgcolor=ft.colors.WHITE,
-                border_radius=10,
-                shadow=ft.BoxShadow(
-                    spread_radius=1,
-                    blur_radius=10,
-                    color=ft.colors.BLACK26,
-                    offset=ft.Offset(0, 0),
-                )
-            ),
+                    ft.Column([self.create_info_row(label, key, unit) for label, key, unit in self.info_items]),
+                ]
+            )
         ]
+
+
         self.navigation_bar = self.page.navigation_bar
 
     def create_info_row(self, label, key, unit):

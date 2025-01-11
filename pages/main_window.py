@@ -119,17 +119,24 @@ class MainWindowPage(ft.View):
         )
 
         # Arrange everything in a Column
+        from flet import ScrollMode
+
         self.controls = [
             ft.AppBar(
                 title=ft.Text("Main Window", color=ft.colors.ON_PRIMARY),
                 bgcolor="#16E3AF"
             ),
-            ft.Row([self.calories_text, self.lunchtime_text, self.search_bar]),
-            ft.Text("Eat Now:", size=18, weight=ft.FontWeight.BOLD, color=ft.colors.ON_SURFACE),
-            meal_items,
-            ft.Text("Extras:", size=18, weight=ft.FontWeight.BOLD, color=ft.colors.ON_SURFACE),
-            extra_items,
-            ft.Row([add_button], alignment=ft.MainAxisAlignment.END)
+            ft.ListView(
+                expand=True,  # Ensure it uses available space and allows scrolling
+                controls=[
+                    ft.Row([self.calories_text, self.lunchtime_text, self.search_bar]),
+                    ft.Text("Eat Now:", size=18, weight=ft.FontWeight.BOLD, color=ft.colors.ON_SURFACE),
+                    meal_items,
+                    ft.Text("Extras:", size=18, weight=ft.FontWeight.BOLD, color=ft.colors.ON_SURFACE),
+                    extra_items,
+                    ft.Row([add_button], alignment=ft.MainAxisAlignment.END)
+                ]
+            )
         ]
 
     def create_meal_card(self, title, calories, image_path):
