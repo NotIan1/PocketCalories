@@ -1,7 +1,7 @@
 import flet as ft
 import sqlite3
 
-from config import DATABASE_DIR, PRODUCTS_IMAGES_DIR
+from config import DATABASE_DIR, PRODUCTS_IMAGES_DIR, WEBSERVER_URL
 
 
 class ChooseProductsPage(ft.View):
@@ -82,7 +82,7 @@ class ChooseProductsPage(ft.View):
         return ft.Container(
             content=ft.Column([
                 ft.Image(
-                    src=PRODUCTS_IMAGES_DIR + image_path if image_path else "assets/products/default.png",
+                    src=WEBSERVER_URL + (PRODUCTS_IMAGES_DIR + image_path if image_path else "products/default.png"),
                     width=120, height=120, fit=ft.ImageFit.CONTAIN
                 ),
                 ft.Text(

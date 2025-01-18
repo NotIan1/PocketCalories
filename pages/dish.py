@@ -1,7 +1,7 @@
 import sqlite3
 import flet as ft
 
-from config import DATABASE_DIR, PRODUCTS_IMAGES_DIR
+from config import DATABASE_DIR, PRODUCTS_IMAGES_DIR, WEBSERVER_URL
 
 
 class DishPage(ft.View):
@@ -109,7 +109,7 @@ class DishPage(ft.View):
     def create_ingredient_card(self, ingredient):
         return ft.Container(
             content=ft.Column([
-                ft.Image(src=PRODUCTS_IMAGES_DIR + ingredient["image"], width=80, height=80, fit=ft.ImageFit.CONTAIN),
+                ft.Image(src=WEBSERVER_URL + PRODUCTS_IMAGES_DIR + ingredient["image"], width=80, height=80, fit=ft.ImageFit.CONTAIN),
                 ft.Text(ingredient["name"], size=12, text_align=ft.TextAlign.CENTER),
                 ft.Text(f"Qty: {ingredient['quantity']}", size=10, color=ft.colors.GREY, text_align=ft.TextAlign.CENTER)
             ], alignment=ft.MainAxisAlignment.CENTER),

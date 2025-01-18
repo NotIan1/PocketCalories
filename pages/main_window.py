@@ -1,6 +1,6 @@
 import flet as ft
 
-from config import DATABASE_DIR, RECIPES_IMAGES_DIR
+from config import DATABASE_DIR, RECIPES_IMAGES_DIR, WEBSERVER_URL
 from data.user_params import UserParameters
 import sqlite3
 
@@ -143,7 +143,7 @@ class MainWindowPage(ft.View):
         """Create a meal card."""
         return ft.Container(
             content=ft.Column([
-                ft.Image(src=RECIPES_IMAGES_DIR + image_path, width=100, height=80),
+                ft.Image(src=WEBSERVER_URL + RECIPES_IMAGES_DIR + image_path, width=100, height=80),
                 ft.Text(title, size=14, weight=ft.FontWeight.BOLD, color=ft.colors.ON_SURFACE),
                 ft.Text(calories, size=12, color=ft.colors.ON_SURFACE_VARIANT),
                 ft.IconButton(

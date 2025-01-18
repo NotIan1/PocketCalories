@@ -1,5 +1,6 @@
 import flet as ft
 
+from config import WEBSERVER_URL
 from data.user_params import UserParameters
 from navbar import navbar
 
@@ -159,4 +160,4 @@ def main(page: ft.Page):
         page.go('/')
 
 
-ft.app(target=main)
+ft.app(target=main, assets_dir=WEBSERVER_URL)
