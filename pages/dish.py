@@ -114,7 +114,7 @@ class DishPage(ft.View):
                 ft.Text(f"Qty: {ingredient['quantity']}", size=10, color=ft.colors.GREY, text_align=ft.TextAlign.CENTER)
             ], alignment=ft.MainAxisAlignment.CENTER),
             width=100,
-            height=100,
+            height=130,  # Increased height to fit wrapped text
             padding=5,
             border_radius=8,
             border=ft.border.all(color=ft.colors.GREY_200),

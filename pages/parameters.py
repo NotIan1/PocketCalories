@@ -85,7 +85,7 @@ class ParameterPage(ft.View):
         self.your_goal = ft.Dropdown(
             label="Your Goal:",
             value=self.user_params.goal,
-            options=[ft.dropdown.Option(goal) for goal in Goal],
+            options=[ft.dropdown.Option(goal.value) for goal in Goal],
             width=300,
             on_change=self.validate_form
         )
