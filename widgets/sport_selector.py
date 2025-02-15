@@ -9,11 +9,15 @@ class SportSelector(ft.Container):
     def __init__(
             self,
             value: str = "",
+            intensities=None,
             on_change: Callable[[str], None] | None = None,
             on_add_new_sport: Callable[[str, dict], None] | None = None
     ):
+        if intensities is None:
+            intensities = {}
         self.value = value
-        self.intensities = {}
+        self.intensities = intensities
+
         self.on_change = on_change
         self.on_add_new_sport = on_add_new_sport
 
