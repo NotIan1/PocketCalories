@@ -1,7 +1,7 @@
 import sqlite3
 import flet as ft
 
-from config import DATABASE_DIR, PRODUCTS_IMAGES_DIR, WEBSERVER_URL
+from config import DATABASE_DIR, PRODUCTS_IMAGES_DIR, WEBSERVER_URL, RECIPES_IMAGES_DIR
 
 
 class DishPage(ft.View):
@@ -17,7 +17,7 @@ class DishPage(ft.View):
         self.dish_title = ft.Text(self.dish_name, size=24, weight=ft.FontWeight.BOLD)
 
         # Dish Image
-        self.dish_image = ft.Image(src=self.dish_info["image"], width=200, height=150)
+        self.dish_image = ft.Image(src=WEBSERVER_URL + RECIPES_IMAGES_DIR + self.dish_info["image"], width=200, height=150)
 
         # Dish Description and Nutritional Info
         self.description_text = ft.Text(self.dish_info["description"], size=14)
