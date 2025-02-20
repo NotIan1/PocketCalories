@@ -153,6 +153,8 @@ class MainWindowPage(ft.View):
                     on_click=lambda _: print("Remove item")
                 )
             ], alignment=ft.MainAxisAlignment.CENTER),
+            width=100,
+            height=130,  # Increased height to fit wrapped text
             padding=8,
             border_radius=8,
             border=ft.border.all(color=ft.colors.OUTLINE),
@@ -174,6 +176,8 @@ class MainWindowPage(ft.View):
                     on_click=lambda _: print("Remove extra item")
                 )
             ], alignment=ft.MainAxisAlignment.CENTER),
+            width=100,
+            height=130,  # Increased height to fit wrapped text
             padding=5,
             border_radius=8,
             border=ft.border.all(color=ft.colors.OUTLINE),
