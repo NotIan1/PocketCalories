@@ -1,6 +1,6 @@
 import flet as ft
 
-from config import DATABASE_DIR, RECIPES_IMAGES_DIR, WEBSERVER_URL
+from config import DATABASE_DIR, RECIPES_IMAGES_DIR, WEBSERVER_URL, PRODUCTS_IMAGES_DIR
 from data.user_params import UserParameters
 import sqlite3
 
@@ -47,39 +47,41 @@ def recommend_meal(calories_left: int, meal_time_label: str, all_recipes: list[d
     return possible_recipes
 
 
+
 def get_all_recipes():
     """
-    Query the 'recipes' table in the SQLite database and return two lists:
-    - main_recipes  (for meals)
-    - extra_recipes (for extras)
+    Queries your SQLite database and returns:
+      - main_recipes (for meals, pulled from the Dishes table)
+      - extra_recipes (snackable items, pulled from the Products table)
     """
     conn = sqlite3.connect(DATABASE_DIR)
     c = conn.cursor()
 
-    # Example table schema:
-    #   CREATE TABLE recipes (
-    #       name TEXT,
-    #       calories INTEGER,
-    #       image_path TEXT,
-    #       is_extra INTEGER
-    #   );
-    #
-    #   is_extra could be 0 (false) or 1 (true)
-
+    # 1) Load from the Dishes table
     c.execute("SELECT name, calories, image FROM Dishes")
     rows = c.fetchall()
 
     main_recipes = []
-    extra_recipes = []
-
-    for name, cal, img_path in rows:
-        # Convert DB row to a dict that matches your card creation
+    for (name, cal, img_path) in rows:
         recipe_data = {
             "title": name,
-            "calories": cal,  # e.g. "600 cal"
+            "calories": cal,
             "image": img_path
         }
         main_recipes.append(recipe_data)
+
+    # 2) Load snackable products as 'extras'
+    c.execute("SELECT name, calories, image FROM Products WHERE snackable = 1")
+    product_rows = c.fetchall()
+
+    extra_recipes = []
+    for (name, cal, img_path) in product_rows:
+        extra_data = {
+            "title": name,
+            "calories": cal,
+            "image": img_path
+        }
+        extra_recipes.append(extra_data)
 
     conn.close()
     return main_recipes, extra_recipes
@@ -99,7 +101,7 @@ class MainWindowPage(ft.View):
 
         # Fetch or unify your recipes. Adjust as needed:
         main_recipes, extra_recipes = get_all_recipes()
-        all_recipes = main_recipes + extra_recipes  # if you want them all in one list
+        all_recipes = main_recipes  # if you want them all in one list
 
         # Determine the mealtime
         meal_time_label = get_meal_time_label()  # e.g. "Breakfast", "Lunch", "Dinner", or "Snack"
@@ -213,7 +215,7 @@ class MainWindowPage(ft.View):
         """Create an extra item card."""
         return ft.Container(
             content=ft.Column([
-                ft.Image(src=image_path, width=80, height=60),
+                ft.Image(src=WEBSERVER_URL + PRODUCTS_IMAGES_DIR + image_path, width=80, height=60),
                 ft.Text(title, size=12, color=ft.colors.ON_SURFACE),
                 ft.Text(calories, size=10, color=ft.colors.ON_SURFACE_VARIANT),
                 ft.IconButton(
