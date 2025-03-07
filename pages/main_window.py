@@ -96,7 +96,7 @@ class MainWindowPage(ft.View):
 
         # Calculate calories based on parameters stored in client_storage
         self.calories_needed = self.page.client_storage.get("calories_needed") or 0
-        self.calories_eaten = self.page.client_storage.get("calories_eaten") or 0
+        self.calories_eaten = 0#self.page.client_storage.get("calories_eaten") or 0
         calories_left = int(self.calories_needed) - int(self.calories_eaten)
 
         # Fetch or unify your recipes. Adjust as needed:
@@ -188,49 +188,121 @@ class MainWindowPage(ft.View):
             )
         ]
 
+
+    def eat_now(self, cals: int):
+        """Update daily calorie count when user clicks Eat Now."""
+        self.calories_eaten += cals
+        # Save back to client storage so it persists
+        self.page.client_storage.set("calories_eaten", self.calories_eaten)
+
+        cal_left = self.calories_needed - self.calories_eaten
+        self.calories_text.value = f"Calories today: {self.calories_eaten} / {self.calories_needed} ({cal_left} left)"
+        self.page.update()
+
     def create_meal_card(self, title, calories, image_path):
-        """Create a meal card."""
         return ft.Container(
-            content=ft.Column([
-                ft.Image(src=WEBSERVER_URL + RECIPES_IMAGES_DIR + image_path, width=100, height=80),
-                ft.Text(title, size=14, weight=ft.FontWeight.BOLD, color=ft.colors.ON_SURFACE),
-                ft.Text(calories, size=12, color=ft.colors.ON_SURFACE_VARIANT),
-                ft.IconButton(
-                    icon=ft.icons.CANCEL,
-                    icon_color=ft.colors.ERROR,
-                    icon_size=16,
-                    on_click=lambda _: print("Remove item")
-                )
-            ], alignment=ft.MainAxisAlignment.CENTER),
-            width=100,
-            height=130,  # Increased height to fit wrapped text
-            padding=8,
-            border_radius=8,
-            border=ft.border.all(color=ft.colors.OUTLINE),
+            width=600,
+            height=600,
+            border_radius=30,
             bgcolor=ft.colors.SURFACE,
+            border=ft.border.all(color=ft.colors.OUTLINE, width=2),
+            padding=16,
+            content=ft.Column(
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                controls=[
+                    # Top: Image
+                    ft.Image(
+                        src=WEBSERVER_URL + RECIPES_IMAGES_DIR + image_path,
+                        width=250,
+                        height=150,
+                        fit=ft.ImageFit.COVER
+                    ),
+                    # Middle: Name & Calories
+                    ft.Column(
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        controls=[
+                            ft.Text(
+                                title,
+                                size=20,
+                                weight=ft.FontWeight.BOLD,
+                                text_align=ft.TextAlign.CENTER,
+                                color=ft.colors.ON_SURFACE
+                            ),
+                            ft.Text(
+                                f"{calories} cal",
+                                size=16,
+                                color=ft.colors.ON_SURFACE_VARIANT,
+                                text_align=ft.TextAlign.CENTER
+                            ),
+                        ]
+                    ),
+                    # Bottom: "EAT NOW" button
+                    ft.ElevatedButton(
+                        text="EAT NOW",
+                        icon=ft.icons.ADD,
+                        style=ft.ButtonStyle(
+                            bgcolor=ft.colors.PRIMARY,
+                            color=ft.colors.ON_PRIMARY,
+                            shape=ft.RoundedRectangleBorder(radius=8),
+                            padding=ft.Padding(14, 14, 14, 14)
+                        ),
+                        expand=True,
+                        on_click=lambda e: self.eat_now(calories),
+                    ),
+                ]
+            ),
             on_click=lambda e: self.open_dish_page(title)
         )
 
     def create_extra_item(self, title, calories, image_path):
-        """Create an extra item card."""
+        """Create an extra card with smaller pictures, too."""
         return ft.Container(
-            content=ft.Column([
-                ft.Image(src=WEBSERVER_URL + PRODUCTS_IMAGES_DIR + image_path, width=80, height=60),
-                ft.Text(title, size=12, color=ft.colors.ON_SURFACE),
-                ft.Text(calories, size=10, color=ft.colors.ON_SURFACE_VARIANT),
-                ft.IconButton(
-                    icon=ft.icons.CANCEL,
-                    icon_color=ft.colors.ERROR,
-                    icon_size=12,
-                    on_click=lambda _: print("Remove extra item")
-                )
-            ], alignment=ft.MainAxisAlignment.CENTER),
-            width=100,
-            height=130,  # Increased height to fit wrapped text
-            padding=5,
+            width=160,
+            height=200,
+            padding=8,
             border_radius=8,
             border=ft.border.all(color=ft.colors.OUTLINE),
-            bgcolor=ft.colors.SURFACE
+            bgcolor=ft.colors.SURFACE,
+            content=ft.Column(
+                [
+                    ft.Image(
+                        src=WEBSERVER_URL + PRODUCTS_IMAGES_DIR + image_path,
+                        width=50,
+                        height=35,  # even smaller for extras
+                        fit=ft.ImageFit.CONTAIN
+                    ),
+                    ft.Text(
+                        title,
+                        size=14,
+                        weight=ft.FontWeight.BOLD,
+                        color=ft.colors.ON_SURFACE,
+                        text_align=ft.TextAlign.CENTER
+                    ),
+                    ft.Text(
+                        f"{calories} cal",
+                        size=12,
+                        color=ft.colors.ON_SURFACE_VARIANT,
+                        text_align=ft.TextAlign.CENTER
+                    ),
+                    ft.Row(
+                        [
+                            ft.ElevatedButton(
+                                text="Eat Now",
+                                icon=ft.icons.ADD,
+                                on_click=lambda e: self.eat_now(calories),
+                            ),
+                            ft.IconButton(
+                                icon=ft.icons.CANCEL,
+                                icon_color=ft.colors.ERROR,
+                                icon_size=16,
+                                on_click=lambda _: print("Remove extra item")
+                            ),
+                        ],
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                    )
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
         )
 
     def open_dish_page(self, dish_name):
