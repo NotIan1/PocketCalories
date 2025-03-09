@@ -96,7 +96,19 @@ class MainWindowPage(ft.View):
 
         # Calculate calories based on parameters stored in client_storage
         self.calories_needed = self.page.client_storage.get("calories_needed") or 0
-        self.calories_eaten = 0#self.page.client_storage.get("calories_eaten") or 0
+        import datetime
+
+        # Retrieve the last recorded date from storage
+        last_recorded_date = self.page.client_storage.get("last_recorded_date")
+        current_date = datetime.date.today().isoformat()
+
+        # Check if the stored date is different from today's date
+        if last_recorded_date != current_date:
+            self.page.client_storage.set("calories_eaten", 0)  # Reset calories
+            self.page.client_storage.set("last_recorded_date", current_date)  # Update last recorded date
+
+        self.calories_eaten = self.page.client_storage.get("calories_eaten") or 0
+
         calories_left = int(self.calories_needed) - int(self.calories_eaten)
 
         # Fetch or unify your recipes. Adjust as needed:
@@ -133,8 +145,9 @@ class MainWindowPage(ft.View):
         #
         # 2. Create GridView for main recipes
         #
+        # In your MainWindowPage __init__ method, update the GridView:
         meal_items = ft.GridView(
-            max_extent=150,  # size of each card
+            max_extent=350,  # increased to allow a larger card size
             padding=10,
             spacing=10,
             run_spacing=10,
@@ -148,7 +161,7 @@ class MainWindowPage(ft.View):
         # 3. Create GridView for extras
         #
         extra_items = ft.GridView(
-            max_extent=100,
+            max_extent=200,
             padding=10,
             spacing=8,
             run_spacing=8,
@@ -201,8 +214,8 @@ class MainWindowPage(ft.View):
 
     def create_meal_card(self, title, calories, image_path):
         return ft.Container(
-            width=600,
-            height=600,
+            width=350,
+            height=450,
             border_radius=30,
             bgcolor=ft.colors.SURFACE,
             border=ft.border.all(color=ft.colors.OUTLINE, width=2),
@@ -210,44 +223,58 @@ class MainWindowPage(ft.View):
             content=ft.Column(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 controls=[
-                    # Top: Image
-                    ft.Image(
-                        src=WEBSERVER_URL + RECIPES_IMAGES_DIR + image_path,
-                        width=250,
-                        height=150,
-                        fit=ft.ImageFit.COVER
+                    # Smaller Image section
+                    ft.Container(
+                        content=ft.Image(
+                            src=WEBSERVER_URL + RECIPES_IMAGES_DIR + image_path,
+                            fit=ft.ImageFit.COVER,
+                        ),
+                        width=350,
+                        height=150,  # Smaller image height
+                        border_radius=ft.border_radius.all(20),
+                        clip_behavior=ft.ClipBehavior.HARD_EDGE,
                     ),
-                    # Middle: Name & Calories
+                    # Text section with title and larger calorie text
                     ft.Column(
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        spacing=8,
                         controls=[
                             ft.Text(
                                 title,
-                                size=20,
+                                size=22,
                                 weight=ft.FontWeight.BOLD,
                                 text_align=ft.TextAlign.CENTER,
                                 color=ft.colors.ON_SURFACE
                             ),
                             ft.Text(
                                 f"{calories} cal",
-                                size=16,
+                                size=20,  # Increased calorie text size
                                 color=ft.colors.ON_SURFACE_VARIANT,
                                 text_align=ft.TextAlign.CENTER
                             ),
                         ]
                     ),
-                    # Bottom: "EAT NOW" button
-                    ft.ElevatedButton(
-                        text="EAT NOW",
-                        icon=ft.icons.ADD,
-                        style=ft.ButtonStyle(
-                            bgcolor=ft.colors.PRIMARY,
-                            color=ft.colors.ON_PRIMARY,
-                            shape=ft.RoundedRectangleBorder(radius=8),
-                            padding=ft.Padding(14, 14, 14, 14)
+                    # "EAT NOW" button that stretches across the whole card with centered content
+                    ft.Container(
+                        width=350 - 32,  # Adjust for container padding: 350 - (16*2)
+                        content=ft.ElevatedButton(
+                            # Use content property to create custom layout
+                            content=ft.Row(
+                                controls=[
+                                    ft.Icon(ft.icons.ADD),
+                                    ft.Text("EAT NOW", text_align=ft.TextAlign.CENTER)
+                                ],
+                                alignment=ft.MainAxisAlignment.CENTER,
+                                spacing=10,
+                            ),
+                            style=ft.ButtonStyle(
+                                bgcolor=ft.colors.PRIMARY,
+                                color=ft.colors.ON_PRIMARY,
+                                shape=ft.RoundedRectangleBorder(radius=8),
+                                padding=ft.Padding(14, 14, 14, 14)
+                            ),
+                            on_click=lambda e: self.eat_now(calories),
                         ),
-                        expand=True,
-                        on_click=lambda e: self.eat_now(calories),
                     ),
                 ]
             ),
@@ -255,10 +282,10 @@ class MainWindowPage(ft.View):
         )
 
     def create_extra_item(self, title, calories, image_path):
-        """Create an extra card with smaller pictures, too."""
+        """Create a larger extra card with bigger pictures and text."""
         return ft.Container(
-            width=160,
-            height=200,
+            width=220,  # Increased width
+            height=280,  # Increased height
             padding=8,
             border_radius=8,
             border=ft.border.all(color=ft.colors.OUTLINE),
@@ -267,20 +294,20 @@ class MainWindowPage(ft.View):
                 [
                     ft.Image(
                         src=WEBSERVER_URL + PRODUCTS_IMAGES_DIR + image_path,
-                        width=50,
-                        height=35,  # even smaller for extras
+                        width=100,  # Increased image width
+                        height=70,  # Increased image height
                         fit=ft.ImageFit.CONTAIN
                     ),
                     ft.Text(
                         title,
-                        size=14,
+                        size=16,  # Increased title text size
                         weight=ft.FontWeight.BOLD,
                         color=ft.colors.ON_SURFACE,
                         text_align=ft.TextAlign.CENTER
                     ),
                     ft.Text(
                         f"{calories} cal",
-                        size=12,
+                        size=14,  # Increased calorie text size
                         color=ft.colors.ON_SURFACE_VARIANT,
                         text_align=ft.TextAlign.CENTER
                     ),
