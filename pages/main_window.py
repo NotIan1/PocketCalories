@@ -48,43 +48,36 @@ def recommend_meal(calories_left: int, meal_time_label: str, all_recipes: list[d
 
 
 
-def get_all_recipes():
+def get_all_recipes(calories_left):
     """
-    Queries your SQLite database and returns:
-      - main_recipes (for meals, pulled from the Dishes table)
-      - extra_recipes (snackable items, pulled from the Products table)
+    Queries the database and filters extra recipes (snacks) based on available calories.
     """
     conn = sqlite3.connect(DATABASE_DIR)
     c = conn.cursor()
 
-    # 1) Load from the Dishes table
+    # Load main meals
     c.execute("SELECT name, calories, image FROM Dishes")
     rows = c.fetchall()
 
-    main_recipes = []
-    for (name, cal, img_path) in rows:
-        recipe_data = {
-            "title": name,
-            "calories": cal,
-            "image": img_path
-        }
-        main_recipes.append(recipe_data)
+    main_recipes = [
+        {"title": name, "calories": cal, "image": img_path}
+        for name, cal, img_path in rows
+    ]
 
-    # 2) Load snackable products as 'extras'
+    # Load extras (only those within calorie limits)
     c.execute("SELECT name, calories, image FROM Products WHERE snackable = 1")
     product_rows = c.fetchall()
 
-    extra_recipes = []
-    for (name, cal, img_path) in product_rows:
-        extra_data = {
-            "title": name,
-            "calories": cal,
-            "image": img_path
-        }
-        extra_recipes.append(extra_data)
+    extra_recipes = [
+        {"title": name, "calories": cal, "image": img_path}
+        for name, cal, img_path in product_rows
+        if cal <= calories_left  # Filter extras by remaining calories
+    ]
+
 
     conn.close()
     return main_recipes, extra_recipes
+
 
 class MainWindowPage(ft.View):
     def __init__(self, page):
@@ -107,13 +100,14 @@ class MainWindowPage(ft.View):
             self.page.client_storage.set("calories_eaten", 0)  # Reset calories
             self.page.client_storage.set("last_recorded_date", current_date)  # Update last recorded date
 
-        self.calories_eaten = self.page.client_storage.get("calories_eaten") or 0
+        self.calories_eaten = 0#self.page.client_storage.get("calories_eaten") or 0
 
         calories_left = int(self.calories_needed) - int(self.calories_eaten)
 
         # Fetch or unify your recipes. Adjust as needed:
-        main_recipes, extra_recipes = get_all_recipes()
-        all_recipes = main_recipes  # if you want them all in one list
+        self.main_recipes, self.extra_recipes = get_all_recipes(calories_left)
+
+        all_recipes = self.main_recipes  # if you want them all in one list
 
         # Determine the mealtime
         meal_time_label = get_meal_time_label()  # e.g. "Breakfast", "Lunch", "Dinner", or "Snack"
@@ -146,7 +140,7 @@ class MainWindowPage(ft.View):
         # 2. Create GridView for main recipes
         #
         # In your MainWindowPage __init__ method, update the GridView:
-        meal_items = ft.GridView(
+        self.meal_items = ft.GridView(
             max_extent=350,  # increased to allow a larger card size
             padding=10,
             spacing=10,
@@ -160,14 +154,14 @@ class MainWindowPage(ft.View):
         #
         # 3. Create GridView for extras
         #
-        extra_items = ft.GridView(
+        self.extra_items = ft.GridView(
             max_extent=200,
             padding=10,
             spacing=8,
             run_spacing=8,
             controls=[
                 self.create_extra_item(r["title"], r["calories"], r["image"])
-                for r in extra_recipes
+                for r in self.extra_recipes
             ]
         )
 
@@ -193,23 +187,31 @@ class MainWindowPage(ft.View):
                 controls=[
                     ft.Row([self.calories_text, self.lunchtime_text, self.search_bar]),
                     ft.Text("Eat Now:", size=18, weight=ft.FontWeight.BOLD, color=ft.colors.ON_SURFACE),
-                    meal_items,
+                    self.meal_items,
                     ft.Text("Extras:", size=18, weight=ft.FontWeight.BOLD, color=ft.colors.ON_SURFACE),
-                    extra_items,
+                    self.extra_items,
                     ft.Row([add_button], alignment=ft.MainAxisAlignment.END)
                 ]
             )
         ]
 
-
     def eat_now(self, cals: int):
-        """Update daily calorie count when user clicks Eat Now."""
+        """Update daily calorie count when user clicks Eat Now and refresh UI."""
         self.calories_eaten += cals
-        # Save back to client storage so it persists
         self.page.client_storage.set("calories_eaten", self.calories_eaten)
 
         cal_left = self.calories_needed - self.calories_eaten
         self.calories_text.value = f"Calories today: {self.calories_eaten} / {self.calories_needed} ({cal_left} left)"
+
+        # Reload recipes and extras based on new calorie count
+        self.main_recipes, self.extra_recipes = get_all_recipes(cal_left)
+        chosen_meals = recommend_meal(cal_left,get_meal_time_label(),self.main_recipes)
+        self.meal_items.controls = [
+                self.create_meal_card(r["title"], r["calories"], r["image"])
+                for r in chosen_meals]
+        self.extra_items.controls = [
+            self.create_extra_item(r["title"], r["calories"], r["image"])
+            for r in self.extra_recipes]
         self.page.update()
 
     def create_meal_card(self, title, calories, image_path):
