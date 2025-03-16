@@ -1,6 +1,7 @@
 import flet as ft
 
 from calculations.activity_calculations import calculate_calories
+from data.sports import SPORTS
 from data.user_params import UserParameters, Goal, Gender, ActivityLevel
 from widgets.sport_selector import SportSelector
 
@@ -80,8 +81,9 @@ class ParameterPage(ft.View):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        self.main_sport = SportSelector(page=page,value=str(self.user_params.main_sport or ""),
-                                        intensities=getattr(self.user_params.main_sport, "intensities", None))
+        self.main_sport = SportSelector(page=page,value=str(self.user_params.main_sport or "No Sport"),
+                                        intensities=getattr(self.user_params.main_sport, "intensities", SPORTS["No Sport"]))
+
 
         self.your_goal = ft.Dropdown(
             label="Your Goal:",

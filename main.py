@@ -18,7 +18,7 @@ from pages.sign_up import SignupPage
 def main(page: ft.Page):
     page.title = "Pocket Calories"
     page.adaptive = True
-
+    #page.client_storage.clear()
     # Initialize settings
     settings = Settings.create(page)
     if not hasattr(settings, 'dark_mode'):
