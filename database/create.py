@@ -1,7 +1,7 @@
 import sqlite3
 
-from database.products import products
-from database.recipes import recipes
+from products import products
+from recipes import recipes
 
 
 def create_database():
