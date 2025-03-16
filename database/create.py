@@ -1,12 +1,13 @@
 import sqlite3
 
-from database.products import products
-from database.recipes import recipes
+from products import products
+from recipes import recipes
 
+database = 'database/recipe_database.db'
 
 def create_database():
     # Connect to SQLite database (or create it if it doesn't exist)
-    conn = sqlite3.connect('recipe_database.db')
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
     # Create Dishes table
@@ -63,7 +64,7 @@ def create_database():
 
 def fill_products_table():
     # Connect to SQLite database
-    conn = sqlite3.connect('recipe_database.db')
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
     # List of 100 different products to insert
@@ -84,7 +85,7 @@ def fill_products_table():
 import sqlite3
 
 def insert_recipes():
-    conn = sqlite3.connect('recipe_database.db')
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
 
