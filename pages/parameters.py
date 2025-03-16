@@ -80,7 +80,7 @@ class ParameterPage(ft.View):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        self.main_sport = SportSelector(value=str(self.user_params.main_sport or ""),
+        self.main_sport = SportSelector(page=page,value=str(self.user_params.main_sport or ""),
                                         intensities=getattr(self.user_params.main_sport, "intensities", None))
 
         self.your_goal = ft.Dropdown(

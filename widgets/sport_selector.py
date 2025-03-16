@@ -8,16 +8,17 @@ from data.sports import SPORTS, Sport
 class SportSelector(ft.Container):
     def __init__(
             self,
+            page,  # Add page as a required parameter
             value: str = "",
             intensities=None,
             on_change: Callable[[str], None] | None = None,
             on_add_new_sport: Callable[[str, dict], None] | None = None
     ):
+        self.page = page  # Assign the page to the instance
         if intensities is None:
             intensities = {}
         self.value = value
         self.intensities = intensities
-
         self.on_change = on_change
         self.on_add_new_sport = on_add_new_sport
 
@@ -35,7 +36,6 @@ class SportSelector(ft.Container):
         super().__init__(bgcolor=ft.colors.GREY_200,
                          border_radius=ft.border_radius.all(5),
                          padding=5,
-                         # margin=5,
                          content=ft.Row(
                              alignment=ft.MainAxisAlignment.CENTER,
                              controls=[
@@ -46,7 +46,7 @@ class SportSelector(ft.Container):
                                      text_align=ft.TextAlign.CENTER,
                                      read_only=True,
                                      border_color="transparent",
-                                     hint_text="Выберите спорт" if not self.value else None,
+                                     hint_text="Choose sport" if not self.value else None,
                                  ),
                                  ft.IconButton(
                                      ref=self.icon_button,
@@ -56,9 +56,8 @@ class SportSelector(ft.Container):
                          ),
                          width=300)
 
-        # self.bgcolor = ft.colors.AMBER,
-        # self.border_radius = ft.border_radius.all(5),
-        # self.alignment = "center"  # центрирует внешний Row
+
+
         self.set_icon_button()
 
     @property
@@ -71,12 +70,12 @@ class SportSelector(ft.Container):
     def show_sport_dialog(self):
         # Создаем диалог выбора спорта
         self.sport_dialog = ft.AlertDialog(
-            title=ft.Text("Выбрать спорт"),
+            title=ft.Text("Choose Sport"),
             content=ft.Column(
                 controls=[
                     ft.TextField(
                         ref=self.search_field,
-                        hint_text="Начните вводить название спорта...",
+                        hint_text="Start writing the name of your sport...",
                         on_change=self.filter_sports,
                         autofocus=True
                     ),
@@ -89,8 +88,8 @@ class SportSelector(ft.Container):
                 tight=True
             ),
             actions=[
-                ft.TextButton("Отмена", on_click=self.close_dialog),
-                ft.TextButton("Изменить", on_click=self.apply_sport_change),
+                ft.TextButton("Close", on_click=self.close_dialog),
+                ft.TextButton("Change", on_click=self.apply_sport_change),
             ]
         )
 
@@ -101,14 +100,14 @@ class SportSelector(ft.Container):
 
     def show_add_sport_dialog(self, sport_name: str):
         self.add_sport_dialog = ft.AlertDialog(
-            title=ft.Text("Добавить новый спорт"),
+            title=ft.Text("Add new sport"),
             content=ft.Container(
                 width=400,  # Фиксированная ширина диалога
                 content=ft.Column(
                     controls=[
                         ft.TextField(
                             ref=self.add_sport_name_field,
-                            label="Название спорта",
+                            label="Name of sport",
                             value=sport_name,
                             on_change=self.validate_name,
                             width=400
@@ -127,7 +126,7 @@ class SportSelector(ft.Container):
                             padding=ft.padding.only(top=10, bottom=10)  # Отступы сверху и снизу
                         ),
                         ft.Text(
-                            "Минимальная интенсивность:",
+                            "Minimal intensity:",
                             size=14,
                             weight=ft.FontWeight.BOLD
                         ),
@@ -142,7 +141,7 @@ class SportSelector(ft.Container):
                             width=400
                         ),
                         ft.Text(
-                            "Средняя интенсивность:",
+                            "medium intensity:",
                             size=14,
                             weight=ft.FontWeight.BOLD
                         ),
@@ -157,7 +156,7 @@ class SportSelector(ft.Container):
                             width=400
                         ),
                         ft.Text(
-                            "Максимальная интенсивность:",
+                            "Maximum intensity:",
                             size=14,
                             weight=ft.FontWeight.BOLD
                         ),
@@ -191,8 +190,8 @@ class SportSelector(ft.Container):
                 padding=20  # Отступы от краёв диалога
             ),
             actions=[
-                ft.TextButton("Отмена", on_click=self.close_add_dialog),
-                ft.TextButton("Добавить", on_click=self.add_new_sport),
+                ft.TextButton("Close", on_click=self.close_add_dialog),
+                ft.TextButton("Add", on_click=self.add_new_sport),
             ]
         )
 
@@ -211,8 +210,8 @@ class SportSelector(ft.Container):
 
         if not (min_val <= avg_val <= max_val):
             self.error_text_sliders.current.value = (
-                "Минимальная интенсивность должна быть меньше средней, "
-                "а средняя меньше максимальной!"
+                "the minimal intensity must be less then the medium intensity, "
+                "The medium must be less than the maximum!"
             )
             self.error_text_sliders.current.visible = True
         else:
@@ -225,7 +224,7 @@ class SportSelector(ft.Container):
         # Проверяем существование спорта
         capitalized_name = self.add_sport_name_field.current.value.title()
         if capitalized_name in SPORTS:
-            self.error_text_name.current.value = f"Спорт '{capitalized_name}' уже существует в списке!"
+            self.error_text_name.current.value = f"Sport '{capitalized_name}' already exists!"
             self.error_text_name.current.visible = True
         else:
             self.error_text_name.current.value = ""
@@ -244,7 +243,7 @@ class SportSelector(ft.Container):
         if (search_term and
                 search_term not in [s.lower() for s in SPORTS]):
             # Добавляем опцию создания нового спорта
-            filtered.append(f"Добавить новый спорт: {self.search_field.current.value}")
+            filtered.append(f"Add new sport: {self.search_field.current.value}")
 
         self.filtered_list.current.controls = [
             ft.ListTile(
@@ -255,9 +254,9 @@ class SportSelector(ft.Container):
         self.page.update()
 
     def handle_sport_selection(self, sport: str):
-        if sport.startswith("Добавить новый спорт: "):
+        if sport.startswith("Add new sport: "):
             # Извлекаем название нового спорта
-            new_sport = sport.replace("Добавить новый спорт: ", "")
+            new_sport = sport.replace("Add new sport: ", "")
             self.close_dialog()
             self.show_add_sport_dialog(new_sport)
         else:
@@ -288,11 +287,13 @@ class SportSelector(ft.Container):
 
     def close_dialog(self, e=None):
         self.sport_dialog.open = False
+        self.page.dialog = None  # Clear the dialog from the page
         self.set_icon_button()
         self.page.update()
 
     def close_add_dialog(self, e=None):
         self.add_sport_dialog.open = False
+        self.page.dialog = None  # Clear the dialog from the page
         self.set_icon_button()
         self.page.update()
 
