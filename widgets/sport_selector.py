@@ -5,64 +5,60 @@ import flet as ft
 from data.sports import SPORTS, Sport
 
 
+from typing import Callable
+import flet as ft
+from data.sports import SPORTS, Sport
+
 class SportSelector(ft.Container):
     def __init__(
             self,
-            page,  # Add page as a required parameter
+            page: ft.Page,
             value: str = "",
             intensities=None,
             on_change: Callable[[str], None] | None = None,
-            on_add_new_sport: Callable[[str, dict], None] | None = None
+            on_add_new_sport: Callable[[str, dict], None] | None = None  # Not used in dropdown version
     ):
-        self.page = page  # Assign the page to the instance
+        self.page = page
         if intensities is None:
             intensities = {}
-        self.value = value
-        self.intensities = intensities
+        # If a valid sport is provided, use it; otherwise default to the first available sport.
+        if value in SPORTS:
+            self.value = value
+            self.intensities = intensities or SPORTS[value]
+        else:
+            self.value = next(iter(SPORTS))
+            self.intensities = SPORTS[self.value]
         self.on_change = on_change
-        self.on_add_new_sport = on_add_new_sport
 
-        self.text_field = ft.Ref[ft.TextField]()
-        self.search_field = ft.Ref[ft.TextField]()
-        self.add_sport_name_field = ft.Ref[ft.TextField]()
-        self.filtered_list = ft.Ref[ft.ListView]()
-        self.min_intensity = ft.Ref[ft.Slider]()
-        self.avg_intensity = ft.Ref[ft.Slider]()
-        self.max_intensity = ft.Ref[ft.Slider]()
-        self.error_text_name = ft.Ref[ft.Text]()
-        self.error_text_sliders = ft.Ref[ft.Text]()
-        self.icon_button = ft.Ref[ft.IconButton]()
+        # Create a dropdown containing all the sports
+        self.dropdown = ft.Dropdown(
+            label="Select Sport",
+            value=self.value,
+            options=[ft.dropdown.Option(sport) for sport in SPORTS.keys()],
+            width=300,
+            on_change=self.handle_change
+        )
 
-        super().__init__(bgcolor=ft.colors.GREY_200,
-                         border_radius=ft.border_radius.all(5),
-                         padding=5,
-                         content=ft.Row(
-                             alignment=ft.MainAxisAlignment.CENTER,
-                             controls=[
-                                 ft.TextField(
-                                     ref=self.text_field,
-                                     value=self.value,
-                                     width=230,
-                                     text_align=ft.TextAlign.CENTER,
-                                     read_only=True,
-                                     border_color="transparent",
-                                     hint_text="Choose sport" if not self.value else None,
-                                 ),
-                                 ft.IconButton(
-                                     ref=self.icon_button,
-                                     on_click=lambda _: self.show_sport_dialog()
-                                 )
-                             ]
-                         ),
-                         width=300)
-
-
-
-        self.set_icon_button()
+        super().__init__(
+            content=self.dropdown,
+            width=300,
+            padding=5,
+            bgcolor=ft.colors.GREY_200,
+            border_radius=ft.border_radius.all(5)
+        )
 
     @property
     def sport(self):
+        # Returns a Sport object with the selected value and its intensities.
         return Sport(self.value, self.intensities)
+
+    def handle_change(self, e):
+        self.value = self.dropdown.value
+        self.intensities = SPORTS.get(self.value, {})
+        if self.on_change:
+            self.on_change(self.value)
+        self.page.update()
+
 
     def set_icon_button(self):
         self.icon_button.current.icon = ft.icons.EDIT if self.value else ft.icons.ADD
