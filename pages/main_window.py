@@ -83,7 +83,6 @@ class MainWindowPage(ft.View):
     def __init__(self, page):
         super().__init__(route='/', padding=20)
         self.page = page
-
         self.user_params = UserParameters.create(page)
         self.navigation_bar = self.page.navigation_bar
 
@@ -114,7 +113,6 @@ class MainWindowPage(ft.View):
 
         # Recommend a meal
         chosen_meals = recommend_meal(calories_left, meal_time_label, all_recipes)
-        print(chosen_meals)
 
         # Calories information
         self.calories_text = ft.Text(
@@ -228,7 +226,7 @@ class MainWindowPage(ft.View):
                     # Smaller Image section
                     ft.Container(
                         content=ft.Image(
-                            src=WEBSERVER_URL + RECIPES_IMAGES_DIR + image_path,
+                            src=RECIPES_IMAGES_DIR + image_path,
                             fit=ft.ImageFit.COVER,
                         ),
                         width=350,
@@ -295,7 +293,7 @@ class MainWindowPage(ft.View):
             content=ft.Column(
                 [
                     ft.Image(
-                        src=WEBSERVER_URL + PRODUCTS_IMAGES_DIR + image_path,
+                        src=PRODUCTS_IMAGES_DIR + image_path,
                         width=100,  # Increased image width
                         height=70,  # Increased image height
                         fit=ft.ImageFit.CONTAIN

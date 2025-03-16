@@ -82,7 +82,7 @@ class ChooseProductsPage(ft.View):
         return ft.Container(
             content=ft.Column([
                 ft.Image(
-                    src=WEBSERVER_URL + (PRODUCTS_IMAGES_DIR + image_path if image_path else "products/default.png"),
+                    src=(PRODUCTS_IMAGES_DIR + image_path if image_path else "products/default.png"),
                     width=120, height=120, fit=ft.ImageFit.CONTAIN
                 ),
                 ft.Text(

@@ -17,7 +17,7 @@ class DishPage(ft.View):
         self.dish_title = ft.Text(self.dish_name, size=24, weight=ft.FontWeight.BOLD)
 
         # Dish Image
-        self.dish_image = ft.Image(src=WEBSERVER_URL + RECIPES_IMAGES_DIR + self.dish_info["image"], width=200, height=150)
+        self.dish_image = ft.Image(src=RECIPES_IMAGES_DIR + self.dish_info["image"], width=200, height=150)
 
         # Dish Description and Nutritional Info
         self.description_text = ft.Text(self.dish_info["description"], size=14)
@@ -109,7 +109,7 @@ class DishPage(ft.View):
     def create_ingredient_card(self, ingredient):
         return ft.Container(
             content=ft.Column([
-                ft.Image(src=WEBSERVER_URL + PRODUCTS_IMAGES_DIR + ingredient["image"], width=80, height=80, fit=ft.ImageFit.CONTAIN),
+                ft.Image(src=PRODUCTS_IMAGES_DIR + ingredient["image"], width=80, height=80, fit=ft.ImageFit.CONTAIN),
                 ft.Text(ingredient["name"], size=12, text_align=ft.TextAlign.CENTER),
                 ft.Text(f"Qty: {ingredient['quantity']}", size=10, color=ft.colors.GREY, text_align=ft.TextAlign.CENTER)
             ], alignment=ft.MainAxisAlignment.CENTER),

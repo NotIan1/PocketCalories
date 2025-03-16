@@ -25,3 +25,5 @@ Schedule
 
 # Extra features
 1. Videos
+
+https://pocketcalories.onrender.com/assets/products/almond_milk.jpg
